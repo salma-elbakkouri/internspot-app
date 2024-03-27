@@ -14,14 +14,41 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      [
+        "@react-native-firebase/app",
+        {
+          "options": {
+            "apiKey": "AIzaSyBETIeD-kChRoJ23Es3ltjiFKuDQ9lDwPE",
+            "authDomain": "projet-fin-etudes-8fd33.firebaseapp.com",
+            "projectId": "projet-fin-etudes-8fd33",
+            "storageBucket": "projet-fin-etudes-8fd33.appspot.com",
+            "messagingSenderId": "383408524224",
+            "appId": "1:383408524224:web:11838f1a9e406eb6221625",
+            "measurementId": "G-98GECG9D0Q"
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.mypfeapp.reactnative"
     },
     "web": {
       "favicon": "./assets/favicon.png"

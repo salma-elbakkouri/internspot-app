@@ -1,0 +1,39 @@
+buildscript {
+    ext {
+        buildToolsVersion = '34.0.0'
+        minSdkVersion = 23
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        kotlinVersion = '1.5.31' // Update to the latest compatible Kotlin version
+        ndkVersion = "25.1.8937393"
+        // Specify versions for dependencies
+        gradlePluginVersion = '0.73.6' // Replace with the actual version
+        reactNativePluginVersion = '0.73.76' // Replace with the actual version
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath "com.facebook.react:react-native-gradle-plugin:$reactNativePluginVersion"
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"
+
+allprojects {
+    repositories {
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url(new File(['node', '--print', "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim(), '../android'))
+        }
+        maven {
+            // Android JSC is installed from npm
+            url(new File(['node', '--print', "require.resolve('jsc-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), '../dist'))
+        }
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
