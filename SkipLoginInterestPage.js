@@ -13,7 +13,6 @@ export default function SkipLoginInterestPage() {
     'Mobile Development',
     'Cybersecurity',
     'Artificial Intelligence',
-    // Add more interests manually here
     'Data Science',
     'Machine Learning',
     'Cloud Computing',

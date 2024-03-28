@@ -12,7 +12,7 @@ import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.react.shell.MainReactPackage
 import com.facebook.soloader.SoLoader
 import expo.modules.ApplicationLifecycleDispatcher
-import io.invertase.firebase.app.ReactNativeFirebaseAppPackage
+import io.invertase.firebase.app.ReactNativeFirebaseAppPackage // Add this import
 
 class MainApplication : Application(), ReactApplication {
 
