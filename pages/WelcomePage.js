@@ -17,7 +17,7 @@ export default function WelcomePage() {
       <Text style={styles.title}>Internspot</Text>
       <View style={styles.content}>
         <Image
-          source={require('./assets/welcomepic.png')}
+          source={require('../assets/welcomepic.png')}
           style={styles.image}
         />
         <View style={styles.textContainer}>

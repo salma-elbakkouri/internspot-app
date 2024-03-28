@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
+import BottomTabBar from '../components/BottomTabBar'; // Import BottomTabBar component
 
-export default function HomePage() {
-  const [selectedItems, setSelectedItems] = useState([]);
-
-  const data = [
+export default function SavedPage({ navigation, route }) {
+  // const savedItems = route.params?.savedItems || [];
+  const [savedItems, setSavedItems] = useState([
     { id: '1', posted: '5 days ago', title: 'Junior UX Designer', duration: '6 months', type: 'Full Time Hybrid', company: 'Amazon', location: 'Sale Rabat, Morocco' },
     { id: '2', posted: '1 hour ago', title: 'Software Engineer', duration: '12 months', type: 'Remote', company: 'Google', location: 'Mountain View, CA' },
     { id: '3', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
     { id: '4', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
     { id: '5', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-  ];
+    { id: '6', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
+  ]);
+  const [selectedItems, setSelectedItems] = useState([]);
 
   const toggleSelection = (id) => {
     if (selectedItems.includes(id)) {
@@ -19,27 +21,33 @@ export default function HomePage() {
     } else {
       setSelectedItems([...selectedItems, id]);
     }
-  };
 
-  const isItemSelected = (id) => {
-    return selectedItems.includes(id);
+    // Remove the item from savedItems if it exists
+    const index = savedItems.findIndex(item => item.id === id);
+    if (index !== -1) {
+      const newSavedItems = [...savedItems];
+      newSavedItems.splice(index, 1);
+      setSavedItems(newSavedItems);
+    }
   };
+  
 
   const renderItem = ({ item }) => (
     <View style={styles.offerContainer}>
       <TouchableOpacity
         style={[
           styles.saveIconContainer,
-          isItemSelected(item.id) && { borderColor: '#0047D2' },
         ]}
-        onPress={() => toggleSelection(item.id)}
+        onPress={() => toggleSelection(item.id)} // Call toggleSelection with item id
       >
         <FontAwesome5
           name="bookmark"
           size={20}
-          color={isItemSelected(item.id) ? '#0047D2' : '#666'}
+          color="#0047D2" // Always blue since these are saved items
         />
       </TouchableOpacity>
+
+      {/* Offer content */}
       <View style={styles.offerContent}>
         <Text style={styles.postedText}>{item.posted}</Text>
         <Text style={styles.titleText}>{item.title}</Text>
@@ -50,7 +58,8 @@ export default function HomePage() {
           </View>
         </View>
         <View style={styles.companyContainer}>
-          <Image source={require('./assets/amazon.jpg')} style={styles.logoImage} />
+          {/* Assuming you have image assets for companies */}
+          <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
           <View style={styles.companyDetails}>
             <Text style={styles.companyName}>{item.company}</Text>
             <Text style={styles.location}>{item.location}</Text>
@@ -62,6 +71,7 @@ export default function HomePage() {
 
   return (
     <View style={styles.container}>
+      {/* Search input and filter button */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -69,40 +79,23 @@ export default function HomePage() {
           placeholderTextColor="lightgray"
         />
         <TouchableOpacity style={styles.filterButton}>
-          <Image source={require('./assets/filtericon.png')} style={styles.filterIcon} />
+          <Image source={require('../assets/filtericon.png')} style={styles.filterIcon} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.recentOffersText}>Recent Offers</Text>
+      {/* Recent offers text */}
+      <Text style={styles.recentOffersText}>Saved Offers</Text>
+      {/* Flatlist for saved offers */}
       <FlatList
-        data={data}
+        data={savedItems}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
-      <View style={styles.barcontainer}>
-        <TouchableOpacity style={styles.baritem}>
-          <FontAwesome5 name="home" size={20} color="#666" />
-          <Text style={styles.baritemtext}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.baritem}>
-          <FontAwesome5 name="bookmark" size={20} color="#666" />
-          <Text style={styles.baritemtext}>Saved</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.baritem}>
-          <FontAwesome5 name="file-alt" size={20} color="#666" />
-          <Text style={styles.baritemtext}>Application</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.baritem}>
-          <FontAwesome5 name="bell" size={20} color="#666" />
-          <Text style={styles.baritemtext}>Notification</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.baritem}>
-          <FontAwesome5 name="user" size={20} color="#666" />
-          <Text style={styles.baritemtext}>Profile</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Bottom tab bar with navigation prop */}
+      <BottomTabBar navigation={navigation} />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -134,13 +127,12 @@ const styles = StyleSheet.create({
   filterButton: {
     padding: 8,
     marginLeft: 10,
-    backgroundColor:'#0047D2',
-    borderRadius:10,
+    backgroundColor: '#0047D2',
+    borderRadius: 10,
   },
   filterIcon: {
     width: 19,
     height: 21,
-    color:'white',
   },
   recentOffersText: {
     fontSize: 18,
@@ -164,7 +156,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 15,
     right: 15,
-    backgroundColor: 'transparent',
     padding: 5,
     borderRadius: 5,
   },
@@ -214,25 +205,5 @@ const styles = StyleSheet.create({
   },
   location: {
     color: '#4A4A4A',
-  },
-  barcontainer: {
-    borderTopColor: '#ccc',
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal:5,
-    marginHorizontal: -10, // Adjusted to remove spacing from left and right
-  },
-  baritem: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-    flex: 1,
-  },
-  baritemtext: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 5,
   },
 });

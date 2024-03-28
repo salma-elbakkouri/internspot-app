@@ -74,7 +74,7 @@ export default function SkipLoginInterestPage() {
           if (selectedInterests.length > 0) {
             // Navigate to HomePage
             // Replace 'HomePage' with the actual name of your HomePage component
-            navigation.navigate('HomePage');
+            navigation.navigate('Home');
           } else {
             // Show popup
             Alert.alert(

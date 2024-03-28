@@ -3,24 +3,25 @@ import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity } 
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const navigation = useNavigation();
 
-    const navigation = useNavigation();
-
-    const navigateToSignup = () => {
-        navigation.navigate('Signup'); //navigate to sign-up page 
-      };
-
-      const navigateToSkipLoginInterestPage = () => {
-        navigation.navigate('SkipLoginInterestPage'); // Navigate to skip login interest page
-      };
-
-
+  const navigateBack = () => {
+    navigation.goBack(); // Go back to the previous screen
+  };
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={require('./assets/bg-login.png')} style={styles.backgroundImage}>
-        <Text style={styles.title}>Login</Text>
+      <ImageBackground source={require('../assets/bg-signup.png')} style={styles.backgroundImage}>
+        <TouchableOpacity style={styles.backButton} onPress={navigateBack}>
+          <FontAwesome name="arrow-left" size={20} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Sign Up</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          placeholderTextColor="#a9a9a9"
+        />
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -32,11 +33,16 @@ export default function LoginPage() {
           placeholderTextColor="#a9a9a9"
           secureTextEntry={true}
         />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          placeholderTextColor="#a9a9a9"
+          secureTextEntry={true}
+        />
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <Text style={styles.forgotPassword}>Forgot Password</Text>
-        <Text style={styles.connectWith}>Or Connect With</Text>
+        <Text style={styles.orText}>OR</Text>
         <View style={styles.socialButtonsContainer}>
           <TouchableOpacity style={styles.socialButton}>
             <FontAwesome name="google" size={20} color="#DB4437" />
@@ -47,10 +53,6 @@ export default function LoginPage() {
             <Text style={styles.socialButtonText}>Continue with Facebook</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.signUpText}>Don't Have An Account? <Text style={styles.signUpLink}  onPress={navigateToSignup}>Sign up</Text></Text>
-        <TouchableOpacity style={styles.skipButton} onPress={navigateToSkipLoginInterestPage}>
-          <Text style={styles.skipButtonText}>Skip this step</Text>
-        </TouchableOpacity>
       </ImageBackground>
     </View>
   );
@@ -66,10 +68,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     resizeMode: 'cover',
   },
+  backButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    zIndex: 1,
+  },
   title: {
     color: '#fff',
     fontSize: 24,
-    marginTop: 100,
+    marginTop:130,
   },
   input: {
     paddingLeft: 15,
@@ -94,16 +102,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
-  forgotPassword: {
-    color: '#fff',
-    marginTop: 20,
-    textDecorationLine: 'underline',
-  },
-  connectWith: {
+  orText: {
     color: 'black',
     marginTop: 100,
     fontSize: 14,
-    marginBottom:10,
+    fontWeight:'bold',
   },
   socialButtonsContainer: {
     marginTop: 10,
@@ -125,23 +128,5 @@ const styles = StyleSheet.create({
     fontSize:16,
     fontWeight:'bold',
     color: 'black',
-  },
-  signUpText: {
-    color: 'black',
-    marginTop: 20,
-  },
-  signUpLink: {
-    color: '#305FD9',
-    textDecorationLine: 'underline',
-  },
-  skipButton: {
-    backgroundColor: '#eff5ff',
-    borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginTop: 20,
-  },
-  skipButtonText: {
-    color: '#215dd9',
   },
 });

@@ -3,11 +3,16 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import WelcomePage from './WelcomePage';
-import LoginPage from './LoginPage';
-import SignupPage from './SignupPage';
-import SkipLoginInterestPage from './SkipLoginInterestPage';
-import HomePage from './HomePage';
+import WelcomePage from './pages/WelcomePage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import SkipLoginInterestPage from './pages/SkipLoginInterestPage';
+import HomePage from './pages/HomePage';
+import SavedPage from './pages/SavedPage';
+import ApplicationPage from './pages/ApplicationPage';
+import NotificationPage from './pages/NotificationPage';
+import ProfilePage from './pages/ProfilePage';
+
 
 
 const Stack = createStackNavigator();
@@ -21,7 +26,11 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="Signup" component={SignupPage} />
         <Stack.Screen name="SkipLoginInterestPage" component={SkipLoginInterestPage} />
-        <Stack.Screen name="HomePage" component={HomePage} options={{ title: 'Home' }} />
+        <Stack.Screen name="Home" component={HomePage} options={{ title: 'Home' }} />
+        <Stack.Screen name="Saved" component={SavedPage} options={{ title: 'SavedPage' }} />
+        <Stack.Screen name="Application" component={ApplicationPage} options={{ title: 'ApplicationPage' }} />
+        <Stack.Screen name="Notification" component={NotificationPage} options={{ title: 'NotificationPage' }} />
+        <Stack.Screen name="Profile" component={ProfilePage} options={{ title: 'ProfilePage' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
