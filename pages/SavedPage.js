@@ -89,6 +89,7 @@ export default function SavedPage({ navigation, route }) {
         data={savedItems}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        contentContainerStyle={{ paddingBottom: 60 }}
       />
       {/* Bottom tab bar with navigation prop */}
       <BottomTabBar navigation={navigation} />

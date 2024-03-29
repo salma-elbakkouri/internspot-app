@@ -12,9 +12,12 @@ export default function LoginPage() {
       };
 
       const navigateToSkipLoginInterestPage = () => {
-        navigation.navigate('SkipLoginInterestPage'); // Navigate to skip login interest page
+        navigation.navigate('SkipLoginInterestPage'); // navigate to skip login interest page
       };
 
+      const navigateToProfilesetupPage = () => {
+        navigation.navigate('ProfilesetupPage'); // navigate to profile setup page :)
+      }
 
 
   return (
@@ -32,7 +35,7 @@ export default function LoginPage() {
           placeholderTextColor="#a9a9a9"
           secureTextEntry={true}
         />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={navigateToProfilesetupPage}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <Text style={styles.forgotPassword}>Forgot Password</Text>

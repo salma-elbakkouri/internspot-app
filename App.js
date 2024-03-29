@@ -1,3 +1,5 @@
+// App.js
+
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
@@ -12,7 +14,7 @@ import SavedPage from './pages/SavedPage';
 import ApplicationPage from './pages/ApplicationPage';
 import NotificationPage from './pages/NotificationPage';
 import ProfilePage from './pages/ProfilePage';
-
+import ProfilesetupPage from './pages/ProfilesetupPage';
 
 
 const Stack = createStackNavigator();
@@ -31,6 +33,8 @@ export default function App() {
         <Stack.Screen name="Application" component={ApplicationPage} options={{ title: 'ApplicationPage' }} />
         <Stack.Screen name="Notification" component={NotificationPage} options={{ title: 'NotificationPage' }} />
         <Stack.Screen name="Profile" component={ProfilePage} options={{ title: 'ProfilePage' }} />
+        <Stack.Screen name="ProfilesetupPage" component={ProfilesetupPage}  />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -40,7 +44,6 @@ function MainScreen({ navigation }) {
   const handleImagePress = () => {
     navigation.navigate('Welcome');
   };
-  
 
   return (
     <View style={styles.container}>

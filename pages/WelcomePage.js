@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     color: '#0047D2',
     fontSize: 21,
     fontWeight: 'bold',
+    marginTop:30,
   },
   content: {
     flex: 1,
@@ -69,14 +70,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   textContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 20,
   },
   bigText: {
     fontSize: 30,
     fontWeight: 'bold',
-    textAlign: 'center',
     marginBottom: 10,
   },
   blackText: {
@@ -88,7 +86,6 @@ const styles = StyleSheet.create({
   },
   smallText: {
     color: '#524B6B',
-    textAlign: 'center',
     fontSize: 12,
   },
   button: {
