@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar'; // Import BottomTabBar component
 
 export default function SavedPage({ navigation, route }) {
@@ -30,24 +30,14 @@ export default function SavedPage({ navigation, route }) {
       setSavedItems(newSavedItems);
     }
   };
-  
+
 
   const renderItem = ({ item }) => (
     <View style={styles.offerContainer}>
-      <TouchableOpacity
-        style={[
-          styles.saveIconContainer,
-        ]}
-        onPress={() => toggleSelection(item.id)} // Call toggleSelection with item id
-      >
-        <FontAwesome5
-          name="bookmark"
-          size={20}
-          color="#0047D2" // Always blue since these are saved items
-        />
+      <TouchableOpacity style={styles.saveIconContainer} onPress={() => toggleSelection(item.id)}>
+        <FontAwesome name="bookmark" size={24} color="black" />
       </TouchableOpacity>
 
-      {/* Offer content */}
       <View style={styles.offerContent}>
         <Text style={styles.postedText}>{item.posted}</Text>
         <Text style={styles.titleText}>{item.title}</Text>
@@ -68,6 +58,7 @@ export default function SavedPage({ navigation, route }) {
       </View>
     </View>
   );
+
 
   return (
     <View style={styles.container}>

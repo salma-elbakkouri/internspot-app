@@ -21,9 +21,16 @@ export default function EducationPage() {
     const navigation = useNavigation();
 
     const navigateToAddEducationPage = () => {
-        navigation.navigate('AddEducationPage'); //navigate to sign-up page 
-      };
-    
+        navigation.navigate('AddEducationPage');
+    };
+
+    const navigateToProfileSetupPage = () => {
+        navigation.navigate('ProfilesetupPage');
+    };
+
+    const navigateToExperiencePage = () => {
+        navigation.navigate('ExperiencePage');
+    };
 
     return (
         <View style={styles.container}>
@@ -45,6 +52,15 @@ export default function EducationPage() {
                     </View>
                 )}
             />
+
+            <View style={styles.navigationButtonsContainer}>
+                <TouchableOpacity style={[styles.navigationButton, { backgroundColor: '#0047D2' }]} onPress={navigateToExperiencePage}>
+                    <Text style={styles.navigationButtonText}>Next</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.navigationButton, { backgroundColor: '#E8F0FF' }]} onPress={navigateToProfileSetupPage}>
+                    <Text style={[styles.navigationButtonText, { color: '#0047D2' }]}>Back</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -60,7 +76,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: 'black',
-        marginTop:50,
+        marginTop: 50,
     },
     addButton: {
         backgroundColor: 'white',
@@ -73,7 +89,7 @@ const styles = StyleSheet.create({
     addButtonLabel: {
         color: '#0047D2',
         textAlign: 'center',
-        fontSize:15,
+        fontSize: 15,
     },
     sectionTitle: {
         fontSize: 16,
@@ -91,5 +107,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 5,
+    },
+    navigationButtonsContainer: {
+        flexDirection: 'column',
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    navigationButton: {
+        backgroundColor: '#0047D2',
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        marginBottom: 10,
+        width:'100%',
+    },
+    navigationButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 16,
     },
 });

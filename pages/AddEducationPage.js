@@ -46,6 +46,7 @@ export default function AddEducationPage() {
     };
 
     const handleSubmit = () => {
+        navigation.goBack();
         // Handle submission logic here
     };
 
@@ -115,7 +116,7 @@ export default function AddEducationPage() {
                         <Text style={[styles.buttonText, { color: "#0047D2" }]}>Cancel</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.button, { backgroundColor: '#0047D2' }]} onPress={handleSubmit}>
-                        <Text style={[styles.buttonText, { color: 'white' }]}>Submit</Text>
+                        <Text style={[styles.buttonText, { color: 'white' }]}>Save</Text>
                     </TouchableOpacity>
                 </View>
             </View>

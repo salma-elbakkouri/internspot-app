@@ -17,6 +17,11 @@ import ProfilePage from './pages/ProfilePage';
 import ProfilesetupPage from './pages/ProfilesetupPage';
 import EducationPage from './pages/EducationPage';
 import AddEducationPage from './pages/AddEducationPage';
+import ExperiencePage from './pages/ExperiencePage';
+import SkillsPage from './pages/SkillsPage';
+import AddExperiencePage from './pages/AddExperiencePage';
+import ProfilecreatedPage from './pages/ProfilecreatedPage';
+import OfferdetailsPage from './pages/OfferdetailPage';
 
 
 const Stack = createStackNavigator();
@@ -38,6 +43,11 @@ export default function App() {
         <Stack.Screen name="ProfilesetupPage" component={ProfilesetupPage}  />
         <Stack.Screen name="EducationPage" component={EducationPage}  />
         <Stack.Screen name="AddEducationPage" component={AddEducationPage}  />
+        <Stack.Screen name="ExperiencePage" component={ExperiencePage}  />
+        <Stack.Screen name="SkillsPage" component={SkillsPage}  />
+        <Stack.Screen name="AddExperiencePage" component={AddExperiencePage}  />
+        <Stack.Screen name="ProfilecreatedPage" component={ProfilecreatedPage}  />
+        <Stack.Screen name="OfferdetailsPage" component={OfferdetailsPage}  />
         
         
       </Stack.Navigator>

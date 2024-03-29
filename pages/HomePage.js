@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Home({ navigation }) {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -29,27 +30,33 @@ export default function Home({ navigation }) {
     }
   };
 
+  const navigation1 = useNavigation();
+
   const isItemSelected = (id) => {
     return selectedItems.includes(id);
   };
 
+  const handleOfferPress = (offer) => {
+    navigation1.navigate('OfferdetailsPage', { offer });
+  };
+
+  const handleSaveOffer = (id) => {
+    toggleSelection(id);
+  };
+
   const renderItem = ({ item }) => (
-    <View style={styles.offerContainer}>
-      <TouchableOpacity
-        style={[
-          styles.saveIconContainer,
-        ]}
-        onPress={() => toggleSelection(item.id)}
-      >
-        <FontAwesome5
-          name="bookmark"
-          size={20}
-          color={savedItems.includes(item.id) ? '#0047D2' : '#666'}
-        />
-      </TouchableOpacity>
+    <View style={styles.offerContainer} >
+      <TouchableOpacity style={styles.saveButton} onPress={() => handleSaveOffer(item.id)}>
+                <FontAwesome name="bookmark" size={24} 
+                color={selectedItems.includes(item.id) ? 'black' : 'lightgray'}
+                ></FontAwesome>
+            </TouchableOpacity>
+
       <View style={styles.offerContent}>
         <Text style={styles.postedText}>{item.posted}</Text>
-        <Text style={styles.titleText}>{item.title}</Text>
+        <TouchableOpacity onPress={() => handleOfferPress(item)}>
+          <Text style={styles.titleText}>{item.title}</Text>
+        </TouchableOpacity>
         <View style={styles.detailsContainer}>
           <Text style={styles.durationText}>{item.duration}</Text>
           <View style={styles.typeContainer}>
@@ -146,13 +153,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'relative',
   },
-  saveIconContainer: {
+  saveButton: {
     position: 'absolute',
     top: 15,
     right: 15,
-    backgroundColor: 'transparent',
-    padding: 5,
-    borderRadius: 5,
+    padding: 8,
+    borderRadius: 50,
   },
   offerContent: {
     flex: 1,
