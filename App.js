@@ -15,6 +15,8 @@ import ApplicationPage from './pages/ApplicationPage';
 import NotificationPage from './pages/NotificationPage';
 import ProfilePage from './pages/ProfilePage';
 import ProfilesetupPage from './pages/ProfilesetupPage';
+import EducationPage from './pages/EducationPage';
+import AddEducationPage from './pages/AddEducationPage';
 
 
 const Stack = createStackNavigator();
@@ -34,6 +36,9 @@ export default function App() {
         <Stack.Screen name="Notification" component={NotificationPage} options={{ title: 'NotificationPage' }} />
         <Stack.Screen name="Profile" component={ProfilePage} options={{ title: 'ProfilePage' }} />
         <Stack.Screen name="ProfilesetupPage" component={ProfilesetupPage}  />
+        <Stack.Screen name="EducationPage" component={EducationPage}  />
+        <Stack.Screen name="AddEducationPage" component={AddEducationPage}  />
+        
         
       </Stack.Navigator>
     </NavigationContainer>

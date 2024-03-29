@@ -2,8 +2,26 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProfilePage({ navigation }) {
+
+
+  const navigation1 = useNavigation();
+
+  const handleLogout = () => {
+    navigation1.navigate('Login');
+  };
+
+
+  const MenuItem = ({ icon, text, onPress }) => (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+      <FontAwesome5 name={icon} size={20} color="#0047D2" />
+      <Text style={styles.menuItemText}>{text}</Text>
+    </TouchableOpacity>
+  );
+  
+
   return (
     <View style={styles.container}>
       {/* Profile Details */}
@@ -25,7 +43,7 @@ export default function ProfilePage({ navigation }) {
         <MenuItem icon="headset" text="Support" />
         <MenuItem icon="shield-alt" text="Privacy Policy" />
         <MenuItem icon="question" text="FAQ" />
-        <MenuItem icon="sign-out-alt" text="Logout" />
+        <MenuItem icon="sign-out-alt" text="Logout" onPress={handleLogout} />
       </View>
 
       {/* Bottom tab bar with navigation prop */}
