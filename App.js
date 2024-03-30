@@ -1,6 +1,6 @@
 // App.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -22,11 +22,21 @@ import SkillsPage from './pages/SkillsPage';
 import AddExperiencePage from './pages/AddExperiencePage';
 import ProfilecreatedPage from './pages/ProfilecreatedPage';
 import OfferdetailsPage from './pages/OfferdetailPage';
+import firestore from '@react-native-firebase/firestore'; // Import firestore module
 
+// Initialize Firebase
+const initializeFirebase = () => {
+  useEffect(() => {
+    // Initialize Firebase
+    firestore().settings({ experimentalForceLongPolling: true }); // Add this line if you're experiencing connection issues
+  }, []);
+};
 
 const Stack = createStackNavigator();
 
 export default function App() {
+  initializeFirebase();
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>

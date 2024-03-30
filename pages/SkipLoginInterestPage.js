@@ -2,38 +2,21 @@ import React, { useState, useEffect } from 'react';
 // import firestore from '@react-native-firebase/firestore'; // Commented out database fetching
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
+
 
 export default function SkipLoginInterestPage() {
   const navigation = useNavigation(); 
 
+  const [interests, setInterests] = useState([]);
 
-  const [interests, setInterests] = useState([
-    'Programming',
-    'Web Development',
-    'Mobile Development',
-    'Cybersecurity',
-    'Artificial Intelligence',
-    'Data Science',
-    'Machine Learning',
-    'Cloud Computing',
-    'Blockchain',
-    'UI/UX Design',
-  ]);
+  useEffect(() => {
+    const data = firestore().collection('interests');
+    console.log(data);
+
+  }, []);
+
   const [selectedInterests, setSelectedInterests] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchInterests = async () => {
-  //     try {
-  //       const interestsSnapshot = await firestore().collection('interests').get();
-  //       const interestsData = interestsSnapshot.docs.map(doc => doc.data().name);
-  //       setInterests(interestsData);
-  //     } catch (error) {
-  //       console.error('Error fetching :', error);
-  //     }
-  //   };
-
-  //   fetchInterests();
-  // }, []);
 
   const toggleInterest = (interest) => {
     if (selectedInterests.includes(interest)) {
