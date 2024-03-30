@@ -1,24 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import DeviceInfo from 'react-native-device-info';
 
 export default function LoginPage() {
 
     const navigation = useNavigation();
+    const [has_interests, setHasInterests] = useState(false);
+
+    DeviceInfo.getAndroidId().then((androidId) => {
+      console.log('Android ID: ', androidId);
+    });
 
     const navigateToSignup = () => {
-        navigation.navigate('Signup'); //navigate to sign-up page 
-      };
+      navigation.navigate('Signup'); //navigate to sign-up page 
+    };
 
-      const navigateToSkipLoginInterestPage = () => {
-        navigation.navigate('SkipLoginInterestPage'); // navigate to skip login interest page
-      };
+    const navigateToHomePage = () => {
+      navigation.navigate('Home'); // navigate to home page
+    }
 
-      const navigateToProfilesetupPage = () => {
-        navigation.navigate('ProfilesetupPage'); // navigate to profile setup page :)
-      }
+    const navigateToSkipLoginInterestPage = () => {
+      navigation.navigate('SkipLoginInterestPage'); // navigate to skip login interest page
+    };
 
+    const navigateToProfilesetupPage = () => {
+      navigation.navigate('ProfilesetupPage'); // navigate to profile setup page :)
+    }
 
   return (
     <View style={styles.container}>

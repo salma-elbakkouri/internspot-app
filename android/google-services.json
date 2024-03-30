@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "383408524224",
+    "project_id": "projet-fin-etudes-8fd33",
+    "storage_bucket": "projet-fin-etudes-8fd33.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383408524224:android:f0199d866cf9dcc4221625",
+        "android_client_info": {
+          "package_name": "com.mypfeapp.reactnative"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARDASPvw9w_dwmYtp9HggNQl0VaIMXlPs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

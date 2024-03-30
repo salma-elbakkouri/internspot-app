@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
-// import firestore from '@react-native-firebase/firestore'; // Commented out database fetching
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import firestore from '@react-native-firebase/firestore';
-
+import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import { db } from '../config/firebase';
+import DeviceInfo from 'react-native-device-info';
 
 export default function SkipLoginInterestPage() {
   const navigation = useNavigation(); 
 
   const [interests, setInterests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const data = firestore().collection('interests');
-    console.log(data);
-
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'interests'));
+        const interestsData = [];
+        querySnapshot.forEach((doc) => {
+          interestsData.push(doc.data().name);
+        });
+        setInterests(interestsData);
+        setLoading(false); // Set loading to false after data is fetched
+      } catch (error) {
+        console.error('Error fetching interests:', error);
+        setLoading(false); // Set loading to false in case of error
+      }
+    };
+    fetchData();
   }, []);
 
   const [selectedInterests, setSelectedInterests] = useState([]);
@@ -24,7 +37,7 @@ export default function SkipLoginInterestPage() {
     } else {
       setSelectedInterests([...selectedInterests, interest]);
     }
-  };
+  }; 
 
   const isInterestSelected = (interest) => {
     return selectedInterests.includes(interest);
@@ -40,15 +53,23 @@ export default function SkipLoginInterestPage() {
       />
       <View style={styles.interestsContainer}>
         <View style={styles.checkboxContainer}>
-          {interests.map(interest => (
-            <TouchableOpacity
-              key={interest}
-              style={[styles.checkboxButton, isInterestSelected(interest) && styles.selected]}
-              onPress={() => toggleInterest(interest)}
-            >
-              <Text style={[styles.checkboxText, isInterestSelected(interest) && styles.selectedText]}>{interest}</Text>
-            </TouchableOpacity>
-          ))}
+        {loading ? (
+            <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
+          ) : (
+            <View style={styles.interestsContainer}>
+              <View style={styles.checkboxContainer}>
+                {interests.map(interest => (
+                  <TouchableOpacity
+                    key={interest}
+                    style={[styles.checkboxButton, isInterestSelected(interest) && styles.selected]}
+                    onPress={() => toggleInterest(interest)}
+                  >
+                    <Text style={[styles.checkboxText, isInterestSelected(interest) && styles.selectedText]}>{interest}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
         </View>
       </View>
       <TouchableOpacity
@@ -57,7 +78,9 @@ export default function SkipLoginInterestPage() {
           if (selectedInterests.length > 0) {
             // Navigate to HomePage
             // Replace 'HomePage' with the actual name of your HomePage component
-            navigation.navigate('Home');
+            // navigation.navigate('Home');
+
+            console.log('Selected interests:', selectedInterests);
           } else {
             // Show popup
             Alert.alert(
@@ -157,4 +180,9 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 14,
   },
+  loadingSpin: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });
