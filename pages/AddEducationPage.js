@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { db } from '../config/firebase';
 
-export default function AddEducationPage() {
+export default function AddEducationPage({ route }) {
+    const userID = route.params?.userID;
     const [school, setSchool] = useState('');
     const [degree, setDegree] = useState('');
     const [specialization, setSpecialization] = useState('');
@@ -45,10 +48,47 @@ export default function AddEducationPage() {
         navigation.goBack();
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        const newEducation = {
+            school,
+            degree,
+            specialization,
+            start_date: startDate,
+            end_date: endDate,
+            description,
+        };
+    
+        const userDocRef = doc(db, 'users', userID);
+    
+        try {
+            const userDocSnapshot = await getDoc(userDocRef);
+            
+            // Check if user document exists
+            if (userDocSnapshot.exists()) {
+                const userData = userDocSnapshot.data();
+                const educations = userData.educations || []; // Initialize educations array if it doesn't exist
+                educations.push(newEducation);
+    
+                await updateDoc(userDocRef, {
+                    educations: educations,
+                });
+            } else {
+                console.error("User document does not exist!");
+            }
+        } catch (error) {
+            console.error("Error fetching user document:", error);
+        }
+
+        setSchool('');
+        setDegree('');
+        setSpecialization('');
+        setSchool('');
+        setDegree('');
+        setSpecialization('');
+    
         navigation.goBack();
-        // Handle submission logic here
     };
+     
 
     return (
         <View style={styles.container}>

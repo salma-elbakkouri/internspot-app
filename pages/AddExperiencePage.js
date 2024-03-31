@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { db } from '../config/firebase';
 
-export default function AddExperiencePage() {
+
+export default function AddExperiencePage({route}) {
+    const userID = route.params?.userID;
     const [company, setCompany] = useState('');
     const [postTitle, setPostTitle] = useState('');
     const [specialization, setSpecialization] = useState('');
@@ -46,9 +50,37 @@ export default function AddExperiencePage() {
         navigation.goBack();
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        const newExperience = {
+            company,
+            post_title: postTitle,
+            specialization,
+            location,
+            start_date: startDate,
+            end_date: endDate,
+            description,
+        };
+        const userDocRef = doc(db, 'users', userID);
+    
+        try {
+            const userDocSnapshot = await getDoc(userDocRef);
+            
+            // Check if user document exists
+            if (userDocSnapshot.exists()) {
+                const userData = userDocSnapshot.data();
+                const experiences = userData.experiences || []; // Initialize experiences array if it doesn't exist
+                experiences.push(newExperience);
+    
+                await updateDoc(userDocRef, {
+                    experiences: experiences,
+                });
+            } else {
+                console.error("User document does not exist!");
+            }
+        } catch (error) {
+            console.error("Error fetching user document:", error);
+        }
         navigation.goBack();
-        // Handle submission logic here
     };
 
     return (

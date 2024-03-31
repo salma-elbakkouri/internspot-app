@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity , TextInput} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { db } from '../config/firebase';
 
-export default function SkillsPage() {
+export default function SkillsPage({route}) {
+    const userID = route.params?.userID;
     const [selectedSkills, setSelectedSkills] = useState([]);
 
     const skills = [
@@ -21,11 +24,28 @@ export default function SkillsPage() {
     const navigation = useNavigation();
 
     const navigateToExperiencePage = () => {
-        navigation.navigate('ExperiencePage');
+        navigation.navigate('ExperiencePage', {userID});
     };
 
-    const navigateToProfilecreatedPage = () => {
-        navigation.navigate('ProfilecreatedPage');
+    const navigateToProfilecreatedPage = async () => {
+        const userDocRef = doc(db, 'users', userID);
+    
+        try {
+            const userDocSnapshot = await getDoc(userDocRef);
+            
+            // Check if user document exists
+            if (userDocSnapshot.exists()) {
+                await updateDoc(userDocRef, {
+                    skills: selectedSkills,
+                });
+            } else {
+                console.error("User document does not exist!");
+            }
+        } catch (error) {
+            console.error("Error fetching user document:", error);
+        }
+
+        navigation.navigate('ProfilecreatedPage', {userID});
     };
 
     return (

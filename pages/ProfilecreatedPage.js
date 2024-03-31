@@ -28,6 +28,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: 'white',
+    padding: 15,
+    paddingLeft: 25,
+    paddingRight: 25,
   },
   successText: {
     marginTop: 90,

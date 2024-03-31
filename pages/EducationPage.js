@@ -1,35 +1,63 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { db } from '../config/firebase';
 
-export default function EducationPage() {
-    const educations = [
-        {
-            title: 'Ingenierie des Applications Mobiles',
-            type: 'License Professionnelle',
-            school: 'Ecole Superieure de Technologie de Salé',
-            duration: 'Oct 2023 - July 2024',
-        },
-        {
-            title: 'Genie Informatique',
-            type: 'Diplome Universitaire de Technologie',
-            school: 'Ecole Superieure de Technologie de Fes',
-            duration: 'Oct 2020 - July 2022',
-        },
-    ];
+export default function EducationPage({ route }) {
+    const userID = route.params?.userID;
+    const [educations, setEducations] = useState([]);
+
+    useEffect(() => {
+        const fetchEducations = async () => {
+            const userDocRef = doc(db, 'users', userID);
+        
+            try {
+                const userDocSnapshot = await getDoc(userDocRef);
+                
+                // Check if user document exists
+                if (userDocSnapshot.exists()) {
+                    const userData = userDocSnapshot.data();
+                    const educationsList = userData.educations || []; // Initialize educations array if it doesn't exist
+                    setEducations(educationsList);
+                } else {
+                    console.error("User document does not exist!");
+                    setEducations([]);
+                }
+            } catch (error) {
+                console.error("Error fetching user document:", error);
+                setEducations([]);
+            }
+        };
+
+        fetchEducations();
+    }, [userID]);
 
     const navigation = useNavigation();
 
     const navigateToAddEducationPage = () => {
-        navigation.navigate('AddEducationPage');
+        navigation.navigate('AddEducationPage', { userID });
     };
 
     const navigateToProfileSetupPage = () => {
-        navigation.navigate('ProfilesetupPage');
+        navigation.goBack();
     };
 
     const navigateToExperiencePage = () => {
-        navigation.navigate('ExperiencePage');
+        navigation.navigate('ExperiencePage', { userID });
+    };
+
+    const formatDateRange = (startDateStr, endDateStr) => {
+        const startDate = new Date(startDateStr);
+        const endDate = new Date(endDateStr);
+    
+        // Get the month and year for the start date
+        const startMonthYear = startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    
+        // Get the month and year for the end date
+        const endMonthYear = endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    
+        return `${startMonthYear} - ${endMonthYear}`;
     };
 
     return (
@@ -45,10 +73,10 @@ export default function EducationPage() {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.educationContainer}>
-                        <Text style={styles.educationTitle}>{item.title}</Text>
-                        <Text>{item.type}</Text>
+                        <Text style={styles.educationTitle}>{item.specialization}</Text>
+                        <Text>{item.degree}</Text>
                         <Text>{item.school}</Text>
-                        <Text>{item.duration}</Text>
+                        <Text>{formatDateRange(item.start_date, item.end_date)}</Text>
                     </View>
                 )}
             />

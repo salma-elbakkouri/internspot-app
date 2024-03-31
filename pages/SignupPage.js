@@ -60,10 +60,11 @@ export default function SignupPage() {
       await sendEmailVerification(user);
   
       // Show success message
-      Alert.alert('Success', 'Sign-up successful, please verify your email to be able to login.');
+      // Alert.alert('Success', 'Sign-up successful, please verify your email to be able to login.');
   
-      // Redirect to login screen upon successful sign-up
-      navigation.navigate('Login'); // Replace 'Login' with the name of your login screen component
+      // navigation.navigate('Login'); 
+      console.log('User signed up:', user);
+      navigation.navigate('SkipLoginInterestPage', {skiped: false, user: user});
     } catch (error) {
       console.error('Error signing up:', error.message);
       Alert.alert('Error', 'Failed to sign up. Please try again.');

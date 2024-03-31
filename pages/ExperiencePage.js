@@ -1,29 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { db } from '../config/firebase';
 
-export default function ExperiencePage() {
-    const experiences = [
-        {
-            title: 'Full Stack Developer',
-            company: 'Digimind',
-            location: 'Rabat - Salé',
-            duration: 'Avril 2023 - July 2023',
-        }
-    ];
+export default function ExperiencePage({route}) {
+    const userID = route.params?.userID;
+    const [experiences, setExperiences] = useState([]);
+
+    useEffect(() => {
+        const fetchExperiences = async () => {
+            const userDocRef = doc(db, 'users', userID);
+        
+            try {
+                const userDocSnapshot = await getDoc(userDocRef);
+                
+                // Check if user document exists
+                if (userDocSnapshot.exists()) {
+                    const userData = userDocSnapshot.data();
+                    const experiencesList = userData.experiences || []; // Initialize experiences array if it doesn't exist
+                    setExperiences(experiencesList);
+                } else {
+                    console.error("User document does not exist!");
+                    setExperiences([]);
+                }
+            } catch (error) {
+                console.error("Error fetching user document:", error);
+                setExperiences([]);
+            }
+        };
+
+        fetchExperiences();
+    }, []);
 
     const navigation = useNavigation();
 
     const navigateToAddExperiencePage = () => {
-        navigation.navigate('AddExperiencePage');
+        navigation.navigate('AddExperiencePage', {userID});
     };
 
     const navigateToEducationPage = () => {
-        navigation.navigate('EducationPage');
+        navigation.navigate('EducationPage', {userID});
     };
 
     const navigateToSkillsPage = () => {
-        navigation.navigate('SkillsPage');
+        navigation.navigate('SkillsPage', {userID});
+    };
+
+    const formatDateRange = (startDateStr, endDateStr) => {
+        const startDate = new Date(startDateStr);
+        const endDate = new Date(endDateStr);
+    
+        // Get the month and year for the start date
+        const startMonthYear = startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    
+        // Get the month and year for the end date
+        const endMonthYear = endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    
+        return `${startMonthYear} - ${endMonthYear}`;
     };
 
     return (
@@ -40,10 +74,10 @@ export default function ExperiencePage() {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.experienceContainer}>
-                        <Text style={styles.experienceTitle}>{item.title}</Text>
+                        <Text style={styles.experienceTitle}>{item.post_title}</Text>
                         <Text>{item.company}</Text>
                         <Text>{item.location}</Text>
-                        <Text>{item.duration}</Text>
+                        <Text>{formatDateRange(item.start_date, item.end_date)}</Text>
                     </View>
                 )}
             />

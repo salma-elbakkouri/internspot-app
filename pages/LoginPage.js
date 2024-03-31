@@ -30,7 +30,7 @@ export default function LoginPage() {
   };
 
   const navigateToSkipLoginInterestPage = () => {
-    navigation.navigate('SkipLoginInterestPage'); // navigate to skip login interest page
+    navigation.navigate('SkipLoginInterestPage', {skiped: false}); // navigate to skip login interest page
   };
 
   const navigateToHomePage = () => {

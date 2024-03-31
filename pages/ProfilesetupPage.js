@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc, where, query, getDocs, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { db } from '../config/firebase';
 
-export default function ProfilesetupPage() {
+export default function ProfilesetupPage({ route }) {
+    const user = route.params?.user;
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [state, setState] = useState('');
+    const [dateOfBirth, setDateOfBirth] = useState(new Date());
+    
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [date, setDate] = useState(new Date());
+    const [date, setDate] = useState();
 
     const showDatePicker = () => {
         setDatePickerVisibility(true);
@@ -16,19 +26,43 @@ export default function ProfilesetupPage() {
     };
 
     const handleConfirm = (selectedDate) => {
-        setDate(selectedDate);
+        setDateOfBirth(selectedDate);
         hideDatePicker();
     };
 
     const navigation = useNavigation();
 
-    const navigateToEducationPage = () => {
-        navigation.navigate('EducationPage'); //navigate to education page 
-      };
+    const navigateToEducationPage = async () => {
+        const q = query(collection(db, 'users'), where('email', '==', user.email));
+        const querySnapshot = await getDocs(q);
+        const userData = [];
+        querySnapshot.forEach((doc) => {
+            userData.push({ id: doc.id, ...doc.data() });
+        });
+    
+        if (userData.length > 0) {
+            const userDocRef = doc(db, 'users', userData[0].id);
+            const newData = {
+                firstName,
+                lastName,
+                email: user.email,
+                phoneNumber,
+                dateOfBirth,
+                state,
+            };
+            await updateDoc(userDocRef, newData);
+    
+            console.log("Profile setup complete : ", userDocRef);
+            navigation.navigate('EducationPage', {userID: userData[0].id});
+        } else {
+            console.log("No user data found for email:", user.email);
+            // Handle case where no user data is found
+        }
+    };    
 
-      const navigateToHomePage = () => {
-        navigation.navigate('Home'); //navigate to education page 
-      };
+    const navigateToHomePage = () => {
+        navigation.navigate('Home', {skiped: false}); //navigate to education page 
+    };
 
     return (
         <View style={styles.container}>
@@ -38,37 +72,44 @@ export default function ProfilesetupPage() {
                 <Text style={styles.label}>First name</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder=""
+                    onChangeText={setFirstName}
+                    value={firstName}
                 />
 
                 <Text style={styles.label}>Last name</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder=""
+                    onChangeText={setLastName}
+                    value={lastName}
                 />
 
                 <Text style={styles.label}>Email address</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder=""
+                    value={user.email}
+                    editable={false}
                 />
 
                 <Text style={styles.label}>Phone number</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder=""
+                    onChangeText={setPhoneNumber}
+                    keyboardType="phone-pad"
+                    required
+                    value={phoneNumber}
                 />
 
                 <Text style={styles.label}>Date of birth</Text>
                 <View style={styles.datePickerContainer}>
                     <TouchableOpacity onPress={showDatePicker}>
-                        <Text>{date.toDateString()}</Text>
+                        <Text>{dateOfBirth.toDateString()}</Text>
                     </TouchableOpacity>
                     <DateTimePickerModal
                         isVisible={isDatePickerVisible}
                         mode="date"
                         onConfirm={handleConfirm}
                         onCancel={hideDatePicker}
+                        date={dateOfBirth}
                     />
                 </View>
 
@@ -76,7 +117,9 @@ export default function ProfilesetupPage() {
                 <Text style={styles.label}>State</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder=""
+                    onChangeText={setState}
+                    value={state}
+                    required
                 // dropdown functionality
                 />
             </View>

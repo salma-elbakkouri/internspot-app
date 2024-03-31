@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore/lite';
 import { db } from '../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function SkipLoginInterestPage({ route }) {
   const skiped = route.params.skiped;
+  const user = route.params?.user;
   const navigation = useNavigation(); 
 
   const [interests, setInterests] = useState([]);
@@ -60,6 +61,15 @@ export default function SkipLoginInterestPage({ route }) {
     }
   };
 
+  navigateProsileSetupPage = async () => {
+    await addDoc(collection(db, 'users'), {
+      email: user.email,
+      interests: selectedInterests,
+    });
+    
+    navigation.navigate('ProfilesetupPage', { user });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Let's choose your interest!</Text>
@@ -96,8 +106,7 @@ export default function SkipLoginInterestPage({ route }) {
             // Navigate to HomePage
             // Replace 'HomePage' with the actual name of your HomePage component
             // navigation.navigate('Home');
-
-            navigateToHomePage();
+            skiped ? navigateToHomePage() : navigateProsileSetupPage();
           } else {
             // Show popup
             Alert.alert(
