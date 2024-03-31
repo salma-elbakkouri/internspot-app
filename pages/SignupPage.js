@@ -1,14 +1,77 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { auth, createUserWithEmailAndPassword, sendEmailVerification } from '../config/firebase'; // Import sendEmailVerification
 
 export default function SignupPage() {
   const navigation = useNavigation();
 
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [hidePassword, setHidePassword] = useState(true);
+  const [hideConfirmPassword, setHideConfirmPassword] = useState(true);
+
   const navigateBack = () => {
     navigation.goBack(); // Go back to the previous screen
   };
+
+
+  const togglePasswordVisibility = () => {
+    setHidePassword(!hidePassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setHideConfirmPassword(!hideConfirmPassword);
+  };
+
+  const handleSubmit = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
+  
+    // Email validation regular expression
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address.');
+      return;
+    }
+  
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
+  
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password should be at least 6 characters long.');
+      return;
+    }
+  
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Send verification email
+      await sendEmailVerification(user);
+  
+      // Show success message
+      Alert.alert('Success', 'Sign-up successful, please verify your email to be able to login.');
+  
+      // Redirect to login screen upon successful sign-up
+      navigation.navigate('Login'); // Replace 'Login' with the name of your login screen component
+    } catch (error) {
+      console.error('Error signing up:', error.message);
+      Alert.alert('Error', 'Failed to sign up. Please try again.');
+    }
+  };
+  
+
+
 
   return (
     <View style={styles.container}>
@@ -21,25 +84,43 @@ export default function SignupPage() {
           style={styles.input}
           placeholder="Name"
           placeholderTextColor="#a9a9a9"
+          onChangeText={setName}
+          value={name}
         />
         <TextInput
           style={styles.input}
           placeholder="Email"
           placeholderTextColor="#a9a9a9"
+          onChangeText={setEmail}
+          value={email}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#a9a9a9"
-          secureTextEntry={true}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          placeholderTextColor="#a9a9a9"
-          secureTextEntry={true}
-        />
-        <TouchableOpacity style={styles.button}>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Password"
+            placeholderTextColor="#a9a9a9"
+            secureTextEntry={hidePassword}
+            onChangeText={setPassword}
+            value={password}
+          />
+          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
+            <FontAwesome name={hidePassword ? 'eye' : 'eye-slash'} size={20} color="black" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Confirm Password"
+            placeholderTextColor="#a9a9a9"
+            secureTextEntry={hideConfirmPassword}
+            onChangeText={setConfirmPassword}
+            value={confirmPassword}
+          />
+          <TouchableOpacity onPress={toggleConfirmPasswordVisibility} style={styles.eyeIcon}>
+            <FontAwesome name={hideConfirmPassword ? 'eye' : 'eye-slash'} size={20} color="black" />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
         <Text style={styles.orText}>OR</Text>
@@ -77,7 +158,7 @@ const styles = StyleSheet.create({
   title: {
     color: '#fff',
     fontSize: 24,
-    marginTop:130,
+    marginTop: 130,
   },
   input: {
     paddingLeft: 15,
@@ -106,7 +187,7 @@ const styles = StyleSheet.create({
     color: 'black',
     marginTop: 100,
     fontSize: 14,
-    fontWeight:'bold',
+    fontWeight: 'bold',
   },
   socialButtonsContainer: {
     marginTop: 10,
@@ -121,12 +202,30 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 250,
     alignSelf: 'center',
-    
+
   },
   socialButtonText: {
     marginLeft: 10,
-    fontSize:16,
-    fontWeight:'bold',
+    fontSize: 16,
+    fontWeight: 'bold',
     color: 'black',
   },
-});
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  passwordInput: {
+    paddingLeft: 15,
+    width: 250,
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 30,
+    paddingHorizontal: 10,
+    color: 'black',
+  },
+  eyeIcon: {
+    position:'absolute',
+    right: 15
+  },
+}); 

@@ -5,6 +5,10 @@ import { FontAwesome } from '@expo/vector-icons';
 const OfferdetailsPage = ({ route, navigation }) => {
     const { offer } = route.params;
 
+    const handelApplyPage = () => {
+        navigation.navigate('ApplyFormPage', { offer });
+    }
+
     // Function to handle saving/un-saving offer
     const handleSaveOffer = () => {
         // Your logic for saving/un-saving offer goes here
@@ -53,7 +57,7 @@ const OfferdetailsPage = ({ route, navigation }) => {
             </View>
 
             {/* Apply button */}
-            <TouchableOpacity style={styles.applyButton}>
+            <TouchableOpacity style={styles.applyButton} onPress={handelApplyPage}>
                 <Text style={styles.applyButtonText}>Apply</Text>
             </TouchableOpacity>
         </View>

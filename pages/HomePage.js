@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Home({ navigation }) {
+
+
+export default function Home({ navigation, route }) {
+  const skiped = route.params?.skiped;
+
   const [selectedItems, setSelectedItems] = useState([]);
   const [savedItems, setSavedItems] = useState([]);
+
+  useEffect(() => {
+    const fetchInterests = async () => {
+      if (skiped) {
+        try {
+          const interestsJson = await AsyncStorage.getItem('interests');
+          if (interestsJson !== null) {
+            const interests = JSON.parse(interestsJson);
+            console.log('Retrieved Interests:', interests); // Debugging
+            // Set your state with the fetched interests
+          }
+        } catch (error) {
+          console.error('Error fetching interests:', error);
+        }
+      } else {
+        console.log('User has not skipped the interests page');
+      }
+    };
+  
+    fetchInterests();
+  }, [skiped]);
 
   const data = [
     { id: '1', posted: '5 days ago', title: 'Junior UX Designer', duration: '6 months', type: 'Full Time Hybrid', company: 'Amazon', location: 'Sale Rabat, Morocco' },
@@ -37,7 +63,7 @@ export default function Home({ navigation }) {
   };
 
   const handleOfferPress = (offer) => {
-    navigation1.navigate('OfferdetailsPage', { offer });
+    navigation1.navigate('OfferdetailPage', { offer });
   };
 
   const handleSaveOffer = (id) => {

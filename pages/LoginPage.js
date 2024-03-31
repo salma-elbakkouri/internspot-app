@@ -1,33 +1,61 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
+import React , {useState} from 'react';
+import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity , Alert } from 'react-native';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import DeviceInfo from 'react-native-device-info';
+import { auth, signInWithEmailAndPassword } from '../config/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function LoginPage() {
+  const [hisfirstlaunch, sethisfirstlaunch] = useState(true);
 
-    const navigation = useNavigation();
-    const [has_interests, setHasInterests] = useState(false);
+  AsyncStorage.getItem('firstlaunch').then((value) => {
+    if (value == null) {
+      AsyncStorage.setItem('firstlaunch', 'false'); // No need to wait for `setItem` to finish, so no await
+      sethisfirstlaunch(true);
+    } else {
+      sethisfirstlaunch(false);
+      console.log('Not first launch');
+    }
+  });
 
-    DeviceInfo.getAndroidId().then((androidId) => {
-      console.log('Android ID: ', androidId);
-    });
+  const navigation = useNavigation();
 
-    const navigateToSignup = () => {
-      navigation.navigate('Signup'); //navigate to sign-up page 
-    };
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [hidePassword, setHidePassword] = useState(true);
 
-    const navigateToHomePage = () => {
-      navigation.navigate('Home'); // navigate to home page
+  const navigateToSignup = () => {
+    navigation.navigate('Signup'); //navigate to sign-up page 
+  };
+
+  const navigateToSkipLoginInterestPage = () => {
+    navigation.navigate('SkipLoginInterestPage'); // navigate to skip login interest page
+  };
+
+  const navigateToHomePage = () => {
+    navigation.navigate('Home', {skiped: true}); // navigate to home page
+  }
+
+  const togglePasswordVisibility = () => {
+    setHidePassword(!hidePassword);
+  };
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
     }
 
-    const navigateToSkipLoginInterestPage = () => {
-      navigation.navigate('SkipLoginInterestPage'); // navigate to skip login interest page
-    };
-
-    const navigateToProfilesetupPage = () => {
-      navigation.navigate('ProfilesetupPage'); // navigate to profile setup page :)
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      Alert.alert('Success', 'Login successful.');
+      navigation.navigate('ProfilesetupPage'); 
+    } catch (error) {
+      console.error('Error signing in:', error.message);
+      Alert.alert('Error', 'Failed to sign in. Please try again.');
     }
+  };
 
   return (
     <View style={styles.container}>
@@ -37,14 +65,23 @@ export default function LoginPage() {
           style={styles.input}
           placeholder="Email"
           placeholderTextColor="#a9a9a9"
+          onChangeText={setEmail}
+          value={email}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#a9a9a9"
-          secureTextEntry={true}
-        />
-        <TouchableOpacity style={styles.button} onPress={navigateToProfilesetupPage}>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Password"
+            placeholderTextColor="#a9a9a9"
+            secureTextEntry={hidePassword}
+            onChangeText={setPassword}
+            value={password}
+          />
+          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
+            <FontAwesome name={hidePassword ? 'eye' : 'eye-slash'} size={20} color="black" />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <Text style={styles.forgotPassword}>Forgot Password</Text>
@@ -59,8 +96,8 @@ export default function LoginPage() {
             <Text style={styles.socialButtonText}>Continue with Facebook</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.signUpText}>Don't Have An Account? <Text style={styles.signUpLink}  onPress={navigateToSignup}>Sign up</Text></Text>
-        <TouchableOpacity style={styles.skipButton} onPress={navigateToSkipLoginInterestPage}>
+        <Text style={styles.signUpText}>Don't Have An Account? <Text style={styles.signUpLink} onPress={navigateToSignup}>Sign up</Text></Text>
+        <TouchableOpacity style={styles.skipButton} onPress={hisfirstlaunch ? navigateToSkipLoginInterestPage : navigateToHomePage}>
           <Text style={styles.skipButtonText}>Skip this step</Text>
         </TouchableOpacity>
       </ImageBackground>
@@ -115,7 +152,7 @@ const styles = StyleSheet.create({
     color: 'black',
     marginTop: 100,
     fontSize: 14,
-    marginBottom:10,
+    marginBottom: 10,
   },
   socialButtonsContainer: {
     marginTop: 10,
@@ -130,12 +167,12 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 250,
     alignSelf: 'center',
-    
+
   },
   socialButtonText: {
     marginLeft: 10,
-    fontSize:16,
-    fontWeight:'bold',
+    fontSize: 16,
+    fontWeight: 'bold',
     color: 'black',
   },
   signUpText: {
@@ -155,5 +192,23 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     color: '#215dd9',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  passwordInput: {
+    paddingLeft: 15,
+    width: 250,
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 30,
+    paddingHorizontal: 10,
+    color: 'black',
+  },
+  eyeIcon: {
+    position:'absolute',
+    right: 15
   },
 });

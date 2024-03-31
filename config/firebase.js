@@ -1,16 +1,8 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
-import { getAnalytics } from "firebase/analytics";
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
-import 'firebase/compat/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore/lite';
+import { getAuth, initializeAuth, getReactNativePersistence, createUserWithEmailAndPassword, sendEmailVerification as sendVerificationEmail, signInWithEmailAndPassword } from 'firebase/auth'; // Import signInWithEmailAndPassword
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBSLvtOwLYJ45f4-AwacbZp9PfHoYpfYcU",
   authDomain: "internspot-app-project.firebaseapp.com",
@@ -21,8 +13,20 @@ const firebaseConfig = {
   measurementId: "G-PZ02B7H27R"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
 
-export { db };
+// Define sendEmailVerification function
+const sendEmailVerification = async (user) => {
+  try {
+    await sendVerificationEmail(user); // Use renamed function
+    console.log('Verification email sent');
+  } catch (error) {
+    console.error('Error sending verification email:', error.message);
+  }
+};
+
+export { db, auth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword }; // Export signInWithEmailAndPassword along with auth

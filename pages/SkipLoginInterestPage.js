@@ -3,9 +3,11 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityInd
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { db } from '../config/firebase';
-import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function SkipLoginInterestPage() {
+
+export default function SkipLoginInterestPage({ route }) {
+  const skiped = route.params.skiped;
   const navigation = useNavigation(); 
 
   const [interests, setInterests] = useState([]);
@@ -41,6 +43,21 @@ export default function SkipLoginInterestPage() {
 
   const isInterestSelected = (interest) => {
     return selectedInterests.includes(interest);
+  };
+
+  navigateToHomePage = () => {
+    if (skiped) {
+      AsyncStorage.setItem('interests', JSON.stringify(selectedInterests))
+        .then(() => {
+          console.log('Selected Interests:', selectedInterests);
+          navigation.navigate('Home', { skiped: true }); // Pass skiped: true
+        })
+        .catch((error) => {
+          console.error('Error setting interests:', error);
+        });
+    } else {
+      navigation.navigate('Home', { skiped: false }); // Pass skiped: false
+    }
   };
 
   return (
@@ -80,7 +97,7 @@ export default function SkipLoginInterestPage() {
             // Replace 'HomePage' with the actual name of your HomePage component
             // navigation.navigate('Home');
 
-            console.log('Selected interests:', selectedInterests);
+            navigateToHomePage();
           } else {
             // Show popup
             Alert.alert(

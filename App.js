@@ -1,6 +1,4 @@
-// App.js
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -21,12 +19,16 @@ import ExperiencePage from './pages/ExperiencePage';
 import SkillsPage from './pages/SkillsPage';
 import AddExperiencePage from './pages/AddExperiencePage';
 import ProfilecreatedPage from './pages/ProfilecreatedPage';
-import OfferdetailsPage from './pages/OfferdetailPage';
+import OfferdetailPage from './pages/OfferdetailPage';
+import ApplicationdetailPage from './pages/ApplicationdetailPage';
+import MessagereceiverPage from './pages/MessagereceiverPage';
+import ApplyFormPage from './pages/ApplyFormPage';
+
+
 
 const Stack = createStackNavigator();
 
 export default function App() {
-
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -47,8 +49,10 @@ export default function App() {
         <Stack.Screen name="SkillsPage" component={SkillsPage}  />
         <Stack.Screen name="AddExperiencePage" component={AddExperiencePage}  />
         <Stack.Screen name="ProfilecreatedPage" component={ProfilecreatedPage}  />
-        <Stack.Screen name="OfferdetailsPage" component={OfferdetailsPage}  />
-        
+        <Stack.Screen name="OfferdetailPage" component={OfferdetailPage}  />
+        <Stack.Screen name="ApplicationdetailPage" component={ApplicationdetailPage}  />
+        <Stack.Screen name="MessagereceiverPage" component={MessagereceiverPage}  />
+        <Stack.Screen name="ApplyFormPage" component={ApplyFormPage}  />
         
       </Stack.Navigator>
     </NavigationContainer>
