@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image } from
 import { FontAwesome5 } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from '../config/firebase'; // Import Firebase auth
 
 export default function ProfilePage({ navigation }) {
 
@@ -10,8 +11,19 @@ export default function ProfilePage({ navigation }) {
   const navigation1 = useNavigation();
 
   const handleLogout = () => {
-    navigation1.navigate('Login');
+    // Perform logout operation
+    // For example, if you're using Firebase Authentication:
+    auth.signOut()
+      .then(() => {
+        // Navigate to the login screen
+        navigation1.navigate('Login');
+      })
+      .catch((error) => {
+        console.error('Error signing out:', error.message);
+        // Handle error if needed
+      });
   };
+  
 
 
   const MenuItem = ({ icon, text, onPress }) => (

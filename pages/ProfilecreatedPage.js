@@ -4,7 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 
 export default function ProfilecreatedPage({ navigation }) {
    const navigateToHomePage = () => {
-    navigation.navigate('Home'); //navigate to education page 
+    navigation.navigate('Home', {skiped: false}); //navigate to education page 
   };
 
   return (

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore/lite';
 import { DocumentPicker } from 'expo-document-picker';
+
 
 
 // TODO: Replace the following with your app's Firebase project configuration
@@ -114,112 +116,74 @@ export default function ApplyFormPage({ navigation }) {
         <FontAwesome name="arrow-left" size={24} color="black" />
       </TouchableOpacity>
 
-      {/* Form */}
-      <View style={styles.formContainer}>
-        {/* Email Input */}
-        <Text style={styles.label}>Email Address</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="email address"
-          placeholderTextColor="#666"
-          onChangeText={setEmail}
-          value={email}
-        />
-
-        {/* Full Name Input */}
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="full name"
-          placeholderTextColor="#666"
-          onChangeText={setFullName}
-          value={fullName}
-        />
-
-        {/* Phone Number Input */}
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="+212"
-          placeholderTextColor="#666"
-          onChangeText={setPhoneNumber}
-          value={phoneNumber}
-          keyboardType="phone-pad"
-        />
-
-        {/* City Input */}
-        <Text style={styles.label}>City</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="city"
-          placeholderTextColor="#666"
-          onChangeText={setCity}
-          value={city}
-        />
-
-        {/* Job Input */}
-        <Text style={styles.label}>Job</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="job"
-          placeholderTextColor="#666"
-          onChangeText={setJob}
-          value={job}
-        />
-
-        {/* Activity Field Input */}
-        <Text style={styles.label}>Activity Field</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="activity field"
-          placeholderTextColor="#666"
-          onChangeText={setActivityField}
-          value={activityField}
-        />
-
-        {/* Education Level Input */}
-        <Text style={styles.label}>Education Level</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="education level"
-          placeholderTextColor="#666"
-          onChangeText={setEducationLevel}
-          value={educationLevel}
-        />
-
-        {/* Experience Years Input */}
-        <Text style={styles.label}>Years of Experience</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="years of experience"
-          placeholderTextColor="#666"
-          onChangeText={setExperienceYears}
-          value={experienceYears}
-          keyboardType="numeric"
-        />
-
-        {/* Motivation Input */}
-        <Text style={styles.label}>Motivation</Text>
-        <TextInput
-          style={[styles.input, { height: 100, textAlignVertical: 'top', paddingTop: 8 }]}
-          placeholder="motivation"
-          placeholderTextColor="#666"
-          onChangeText={setMotivation}
-          value={motivation}
-          multiline
-        />
-
-        <View>
-          <Text style={styles.label}>Upload Resume</Text>
-          <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
-            <Text style={styles.uploadButtonText}>Upload</Text>
+      <View style={styles.pageContent}>
+        <View style={styles.profileSection}>
+          <View style={styles.infoProfile}>
+            <Text style={styles.name}>Hicham Amazigh</Text>
+            <Text style={styles.title}>Software Developer</Text>
+          </View>
+          <TouchableOpacity style={styles.editProfileBtn}>
+            <AntDesign name="edit" size={28} color="black" />
           </TouchableOpacity>
         </View>
+        <View style={styles.cardBlock}>
+          <View style={styles.cardHeader}>
+            <MaterialCommunityIcons name="contacts-outline" size={24} color="#0047D2" />
+            <Text style={styles.ContactTitle}>Contact Information</Text>
+          </View>
+          <Text style={styles.CardText}>Sidi moussa, Salé, Rabat</Text>
+          <Text style={styles.CardText}>+212612345678</Text>
+          <Text style={styles.CardText}>student@gmail.com</Text>
+        </View>
 
-        {/* Submit Button */}
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Submit</Text>
-        </TouchableOpacity>
+        <View style={styles.cardBlock}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="newspaper-outline" size={24} color="#0047D2" />
+            <Text style={styles.ContactTitle}>Summary</Text>
+          </View>
+          <Text style={styles.CardText}>Hello, my name is Hicham, and I'm a UX/UI design student with a passion for crafting seamless and engaging user experiences.</Text>
+        </View>
+
+        <View style={styles.cardBlock}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="school-outline" size={24} color="#0047D2" />
+            <Text style={styles.ContactTitle}>Education</Text>
+          </View>
+          <View style={styles.educationItem}>
+            <Text style={styles.CardEducationTitle}>Mobile applications engineer</Text>
+            <Text style={styles.CardText}>License degree, High school of technology of Salé</Text>
+            <Text style={styles.CardText}>Oct 2023 - July 2024</Text>
+          </View>
+          <View style={styles.educationItem}>
+            <Text style={styles.CardEducationTitle}>Mobile applications engineer</Text>
+            <Text style={styles.CardText}>License degree, High school of technology of Salé</Text>
+            <Text style={styles.CardText}>Oct 2023 - July 2024</Text>
+          </View>
+        </View>
+
+        <View style={styles.cardBlock}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="school-outline" size={24} color="#0047D2" />
+            <Text style={styles.ContactTitle}>Experience</Text>
+          </View>
+          <View style={styles.educationItem}>
+            <Text style={styles.CardEducationTitle}>Full Stack Developer</Text>
+            <Text style={styles.CardText}>CEGEDIM - Rabat, Rabat-Salé-Kénitra, Maroc (Hybride)</Text>
+            <Text style={styles.CardText}>Oct 2023 - July 2024</Text>
+          </View>
+          <View style={styles.educationItem}>
+            <Text style={styles.CardEducationTitle}>Full Stack Developer</Text>
+            <Text style={styles.CardText}>CEGEDIM - Rabat, Rabat-Salé-Kénitra, Maroc (Hybride)</Text>
+            <Text style={styles.CardText}>Oct 2023 - July 2024</Text>
+          </View>
+        </View>
+
+        {/* Apply button */}
+        <View style={styles.applyButtonContainer}>
+            <TouchableOpacity style={styles.applyButton}>
+                <Text style={styles.applyButtonText}>Apply</Text>
+            </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -233,48 +197,88 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 60,
+    top: 40,
     left: 20,
-    zIndex: 1,
+    zIndex: 999,
   },
-  formContainer: {
-    paddingTop: 90,
+  pageContent: {
+    flex: 1,
+    marginTop: 70,
+    flexDirection: 'column',
   },
-  label: {
-    fontSize: 16,
-    color: 'black',
-    marginBottom: 5,
+  profileSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    alignItems: 'center',
+    marginRight: 5,
+    marginBottom: 40,
+  },
+  editProfileBtn: {
+    zIndex: 999,
+  },
+  infoProfile: {
+    flexDirection: 'column',
+  },
+  name: {
+    fontSize: 24,
     fontWeight: 'bold',
   },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
+  title: {
+    fontSize: 18,
+  },
+  cardBlock: {
     borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
   },
-  submitButton: {
+  ContactTitle: {
+    marginLeft: 8,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  CardText: {
+    fontSize: 16,
+  },
+  CardEducationTitle: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingBottom: 5,
+  },
+  educationItem: {
+    flexDirection: 'column',
+    marginBottom: 6,
+  },
+  applyButton: {
     backgroundColor: '#0047D2',
-    padding: 15,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginTop: 'auto',
+    borderRadius: 20,
+    paddingVertical: 15,
+    position: 'absolute',
+    bottom: 10,
+    left: 20,
+    right: 20,
   },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  applyButtonContainer: {
+      backgroundColor: 'white',
+      width: '100%',
+      height: 70,
+      padding: 10
   },
-  uploadButton: {
-    backgroundColor: 'gray',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  uploadButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  applyButtonText: {
+      color: 'white',
+      fontSize: 16,
+      textAlign: 'center',
   },
 });

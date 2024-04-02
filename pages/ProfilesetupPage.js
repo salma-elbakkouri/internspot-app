@@ -51,8 +51,6 @@ export default function ProfilesetupPage({ route }) {
                 state,
             };
             await updateDoc(userDocRef, newData);
-    
-            console.log("Profile setup complete : ", userDocRef);
             navigation.navigate('EducationPage', {userID: userData[0].id});
         } else {
             console.log("No user data found for email:", user.email);

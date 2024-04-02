@@ -1,47 +1,121 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../config/firebase'; // Import Firebase auth
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { db } from '../config/firebase';
 
 
 
 export default function Home({ navigation, route }) {
   const skiped = route.params?.skiped;
 
+  const [interests, setInterests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [selectedItems, setSelectedItems] = useState([]);
   const [savedItems, setSavedItems] = useState([]);
+  const [data, setData] = useState([]);
+
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const fetchInterests = async () => {
-      if (skiped) {
-        try {
-          const interestsJson = await AsyncStorage.getItem('interests');
-          if (interestsJson !== null) {
-            const interests = JSON.parse(interestsJson);
-            console.log('Retrieved Interests:', interests); // Debugging
-            // Set your state with the fetched interests
-          }
-        } catch (error) {
-          console.error('Error fetching interests:', error);
-        }
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+        fetchUserData(user.email);
       } else {
-        console.log('User has not skipped the interests page');
+        // Handle case when user is not signed in
+        // Alert.alert('Error', 'User not signed in.');
+        // Optionally, you can navigate to the login screen here
+        // navigation.navigate('Login');
+        const fetchInterests = async () => {
+          if (skiped) {
+            try {
+              const interestsJson = await AsyncStorage.getItem('interests');
+              if (interestsJson !== null) {
+                const interests = JSON.parse(interestsJson);
+                console.log('Retrieved Interests:', interests); // Debugging
+                // Set your state with the fetched interests
+              }
+            } catch (error) {
+              console.error('Error fetching interests:', error);
+            }
+          } else {
+            console.log('User has not skipped the interests page');
+          }
+        };
+      
+        fetchInterests();
       }
-    };
-  
-    fetchInterests();
-  }, [skiped]);
+    });
 
-  const data = [
-    { id: '1', posted: '5 days ago', title: 'Junior UX Designer', duration: '6 months', type: 'Full Time Hybrid', company: 'Amazon', location: 'Sale Rabat, Morocco' },
-    { id: '2', posted: '1 hour ago', title: 'Software Engineer', duration: '12 months', type: 'Remote', company: 'Google', location: 'Mountain View, CA' },
-    { id: '3', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-    { id: '4', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-    { id: '5', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-    { id: '6', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-  ];
+    return () => unsubscribe(); // Cleanup function
+  }, []);
+
+  const fetchHomeOffers = async (interests) => {
+    console.log('Fetching home offers for interests:', interests);
+  
+    try {
+      const offers = [];
+  
+      // Construct a Firestore query for each interest and parameter
+      for (const interest of interests) {
+        if (interest) {
+          const dataOffers = await getDocs(collection(db, 'offers'));
+  
+          dataOffers.forEach((doc) => {
+            const { title, additional_info, description } = doc.data();
+  
+            if (title.includes(interest) || 
+                (additional_info?.Fonction?.includes(interest) || additional_info?.Domaine?.includes(interest)) || 
+                description.includes(interest)) {
+              offers.push({ id: doc.id, ...doc.data() });
+            }
+          });
+        }
+      }
+  
+      // Sort offers by Posted_Date from newest to oldest
+      offers.sort((a, b) => new Date(b.general_info.Posted_Date) - new Date(a.general_info.Posted_Date));
+  
+      // Set data and loading state after all offers have been fetched and sorted
+      setData(offers);
+      setLoading(false);
+  
+    } catch (error) {
+      console.error('Error fetching home offers:', error);
+      // Handle error as needed
+    }
+  };
+
+  const fetchUserData = async (email) => {
+    try {
+      const querySnapshot = await getDocs(
+        query(collection(db, 'users'), where('email', '==', email))
+      );
+
+      if (!querySnapshot.empty) {
+        // Assuming there's only one document for each user email
+        const userData = querySnapshot.docs[0].data();
+
+        const interestsList = userData.interests || [];
+        setInterests(interestsList);
+
+        fetchHomeOffers(interestsList);
+        
+      } else {
+        console.log('No such document!');
+        setInterests([]);
+      }
+    } catch (error) {
+      console.error('Error fetching user document:', error);
+      setInterests([]);
+    }
+  };
 
   const toggleSelection = (id) => {
     if (selectedItems.includes(id)) {
@@ -66,39 +140,68 @@ export default function Home({ navigation, route }) {
     navigation1.navigate('OfferdetailPage', { offer });
   };
 
-  const handleSaveOffer = (id) => {
-    toggleSelection(id);
+  const handleSaveOffer = (offer) => {
+    toggleSelection(offer.id);
+    console.log('Saving offer:', offer);
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.offerContainer} >
-      <TouchableOpacity style={styles.saveButton} onPress={() => handleSaveOffer(item.id)}>
-                <FontAwesome name="bookmark" size={24} 
-                color={selectedItems.includes(item.id) ? 'black' : 'lightgray'}
-                ></FontAwesome>
-            </TouchableOpacity>
-
-      <View style={styles.offerContent}>
-        <Text style={styles.postedText}>{item.posted}</Text>
-        <TouchableOpacity onPress={() => handleOfferPress(item)}>
-          <Text style={styles.titleText}>{item.title}</Text>
+  const renderItem = ({ item }) => {
+    // Convert Posted_Date string to Date object
+    const postedDate = new Date(item.general_info.Posted_Date);
+  
+    // Get the current date and time
+    const currentDate = new Date();
+  
+    // Calculate the time difference in milliseconds
+    const timeDifference = currentDate - postedDate;
+  
+    // Convert milliseconds to seconds, minutes, hours, and days
+    const secondsDifference = Math.floor(timeDifference / 1000);
+    const minutesDifference = Math.floor(secondsDifference / 60);
+    const hoursDifference = Math.floor(minutesDifference / 60);
+    const daysDifference = Math.floor(hoursDifference / 24);
+  
+    // Determine the appropriate time unit to display
+    let timeAgo;
+    if (daysDifference > 0) {
+      timeAgo = `${daysDifference} day${daysDifference > 1 ? 's' : ''} ago`;
+    } else if (hoursDifference > 0) {
+      timeAgo = `${hoursDifference} hour${hoursDifference > 1 ? 's' : ''} ago`;
+    } else if (minutesDifference > 0) {
+      timeAgo = `${minutesDifference} minute${minutesDifference > 1 ? 's' : ''} ago`;
+    } else {
+      timeAgo = `${secondsDifference} second${secondsDifference > 1 ? 's' : ''} ago`;
+    }
+  
+    return (
+      <View style={styles.offerContainer}>
+        <TouchableOpacity style={styles.saveButton} onPress={() => handleSaveOffer(item)}>
+          <FontAwesome name="bookmark" size={24} 
+            color={selectedItems.includes(item.id) ? 'black' : 'lightgray'}
+          ></FontAwesome>
         </TouchableOpacity>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.durationText}>{item.duration}</Text>
-          <View style={styles.typeContainer}>
-            <Text style={styles.typeText}>{item.type}</Text>
+        <TouchableOpacity onPress={() => handleOfferPress(item)}>
+          <View style={styles.offerContent}>
+            <Text style={styles.postedText}>Posted {timeAgo}</Text>
+            <Text style={styles.titleText}>{item.title}</Text>
+            <View style={styles.detailsContainer}>
+              <Text style={styles.durationText}>Salaire  -</Text>
+              <View style={styles.typeContainer}>
+                <Text style={styles.typeText}>{item.additional_info.Salaire}</Text>
+              </View>
+            </View>
+            <View style={styles.companyContainer}>
+              <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
+              <View style={styles.companyDetails}>
+                <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
+                <Text style={styles.location}>{item.general_info.City}</Text>
+              </View>
+            </View>
           </View>
-        </View>
-        <View style={styles.companyContainer}>
-          <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
-          <View style={styles.companyDetails}>
-            <Text style={styles.companyName}>{item.company}</Text>
-            <Text style={styles.location}>{item.location}</Text>
-          </View>
-        </View>
+        </TouchableOpacity>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -113,16 +216,22 @@ export default function Home({ navigation, route }) {
         </TouchableOpacity>
       </View>
       <Text style={styles.recentOffersText}>Recent Offers</Text>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={{ paddingBottom: 60 }}
-      />
+      {loading ? 
+        <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
+        : 
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={{ paddingBottom: 60 }}
+        />
+      }
       <BottomTabBar navigation={navigation} savedItems={savedItems} />
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -233,4 +342,9 @@ const styles = StyleSheet.create({
   location: {
     color: '#4A4A4A',
   },
+  loadingSpin: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });

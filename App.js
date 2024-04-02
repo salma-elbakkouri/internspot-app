@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -23,7 +23,8 @@ import OfferdetailPage from './pages/OfferdetailPage';
 import ApplicationdetailPage from './pages/ApplicationdetailPage';
 import MessagereceiverPage from './pages/MessagereceiverPage';
 import ApplyFormPage from './pages/ApplyFormPage';
-
+import ApplyWebView from './pages/ApplyWebView';
+import { auth } from './config/firebase'; // Import Firebase auth
 
 
 const Stack = createStackNavigator();
@@ -53,6 +54,7 @@ export default function App() {
         <Stack.Screen name="ApplicationdetailPage" component={ApplicationdetailPage}  />
         <Stack.Screen name="MessagereceiverPage" component={MessagereceiverPage}  />
         <Stack.Screen name="ApplyFormPage" component={ApplyFormPage}  />
+        <Stack.Screen name="ApplyWebView" component={ApplyWebView} />
         
       </Stack.Navigator>
     </NavigationContainer>
@@ -60,13 +62,29 @@ export default function App() {
 }
 
 function MainScreen({ navigation }) {
-  const handleImagePress = () => {
-    navigation.navigate('Welcome');
-  };
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is authenticated, redirect to Home
+        navigation.replace('Home');
+      } else {
+        // No user is authenticated, redirect to Welcome after a delay
+        setTimeout(() => {
+          navigation.replace('Welcome');
+        }, 2000);
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup function
+  }, []);
+
+  // setTimeout(() => {
+  //   navigation.navigate('Welcome');
+  // }, 2000);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleImagePress}>
+      <TouchableOpacity>
         <Image
           source={require('./assets/applogo.png')}
           style={styles.logo}

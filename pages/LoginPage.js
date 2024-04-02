@@ -15,7 +15,6 @@ export default function LoginPage() {
       sethisfirstlaunch(true);
     } else {
       sethisfirstlaunch(false);
-      console.log('Not first launch');
     }
   });
 
@@ -48,9 +47,10 @@ export default function LoginPage() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert('Success', 'Login successful.');
-      navigation.navigate('ProfilesetupPage'); 
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userData = userCredential.user;
+      // Alert.alert('Success', 'Login successful.');
+      navigation.navigate('Home', { user: userData });
     } catch (error) {
       console.error('Error signing in:', error.message);
       Alert.alert('Error', 'Failed to sign in. Please try again.');

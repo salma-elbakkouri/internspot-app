@@ -63,7 +63,7 @@ export default function SignupPage() {
       // Alert.alert('Success', 'Sign-up successful, please verify your email to be able to login.');
   
       // navigation.navigate('Login'); 
-      console.log('User signed up:', user);
+      // console.log('User signed up:', user);
       navigation.navigate('SkipLoginInterestPage', {skiped: false, user: user});
     } catch (error) {
       console.error('Error signing up:', error.message);

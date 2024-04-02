@@ -31,7 +31,7 @@ export default function EducationPage({ route }) {
         };
 
         fetchEducations();
-    }, [userID]);
+    }, []);
 
     const navigation = useNavigation();
 
