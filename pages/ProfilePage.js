@@ -1,28 +1,53 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image, Alert } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../config/firebase'; // Import Firebase auth
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProfilePage({ navigation }) {
 
 
   const navigation1 = useNavigation();
 
-  const handleLogout = () => {
-    // Perform logout operation
-    // For example, if you're using Firebase Authentication:
-    auth.signOut()
-      .then(() => {
-        // Navigate to the login screen
-        navigation1.navigate('Login');
-      })
-      .catch((error) => {
-        console.error('Error signing out:', error.message);
-        // Handle error if needed
-      });
-  };
+  
+const handleLogout = async () => {
+  // Show confirmation alert
+  Alert.alert(
+    'Logout',
+    'Are you sure you want to log out?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            // Perform logout operation
+            // For example, if you're using Firebase Authentication:
+            await auth.signOut();
+
+            // Remove items from AsyncStorage
+            await AsyncStorage.removeItem('firstlaunch');
+            await AsyncStorage.removeItem('interests');
+            await AsyncStorage.removeItem('cookies');
+
+            // Navigate to the login screen
+            navigation1.navigate('Login');
+
+          } catch (error) {
+            console.error('Error signing out:', error.message);
+            // Handle error if needed
+          }
+        },
+      },
+    ],
+    { cancelable: false }
+  );
+};
   
 
 

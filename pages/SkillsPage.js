@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity , TextInput} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
 import { db } from '../config/firebase';
 
-export default function SkillsPage({route}) {
+export default function SkillsPage({ route }) {
+    const navigation = useNavigation();
     const userID = route.params?.userID;
     const [selectedSkills, setSelectedSkills] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [skills, setSkills] = useState([]);
+    const [defaultSkills, setDefaultSkills] = useState([]);
 
-    const skills = [
-        'Python', 'Node.js', 'JavaScript', 'PostgreSQL', 'GitHub', 'Firebase', 'Agile', 'Scrum', 'Figma', 'Java', 'UX design', 'UI design', 'Android Dev', 'Power BI tool', 'Django', 'Mongo db',
-    ];
+    const fetchSkills = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, 'skills'));
+            const skillsData = [];
+            querySnapshot.forEach((doc) => {
+                skillsData.push(doc.data().name);
+            });
+            setSkills(skillsData);
+            setDefaultSkills(skillsData);
+        } catch (error) {
+            console.error("Error fetching skills:", error);
+        }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchSkills();
+    }, [])
 
     const toggleSkillSelection = (skill) => {
         if (selectedSkills.includes(skill)) {
@@ -20,20 +39,21 @@ export default function SkillsPage({route}) {
         }
     };
 
-
-    const navigation = useNavigation();
-
     const navigateToExperiencePage = () => {
-        navigation.navigate('ExperiencePage', {userID});
+        navigation.navigate('ExperiencePage', { userID });
     };
 
     const navigateToProfilecreatedPage = async () => {
         const userDocRef = doc(db, 'users', userID);
-    
+
         try {
             const userDocSnapshot = await getDoc(userDocRef);
-            
-            // Check if user document exists
+            defaultSkills.forEach(async (skill) => {
+                if (!skills.includes(skill)) {
+                    await storeNewSkill(skill);
+                }
+            });
+
             if (userDocSnapshot.exists()) {
                 await updateDoc(userDocRef, {
                     skills: selectedSkills,
@@ -45,35 +65,68 @@ export default function SkillsPage({route}) {
             console.error("Error fetching user document:", error);
         }
 
-        navigation.navigate('ProfilecreatedPage', {userID});
+        navigation.navigate('ProfilecreatedPage', { userID });
     };
+
+    const storeNewSkill = async (skill) => {
+        const skillsCollectionRef = collection(db, 'skills');
+        await addDoc(skillsCollectionRef, {
+            name: skill,
+        });
+    };
+
+    const addNewSkill = async (text) => {
+        if (text !== '') {
+            const querySnapshot = await getDocs(collection(db, 'skills'));
+            const skillsData = [];
+            querySnapshot.forEach((doc) => {
+                skillsData.push(doc.data().name);
+            });
+            const filteredSkills = skillsData.filter((skill) => skill.toLowerCase().includes(text.toLowerCase()));
+            setSkills([text, ...filteredSkills]);
+        }else{
+            const addedSkills = [];
+            selectedSkills.forEach((skill) => {
+                if (!skills.includes(skill)) {
+                    addedSkills.push(skill);
+                }
+            });
+
+            setSkills([...addedSkills, ...skills]);
+        }
+    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>What is your skill?</Text>
             <TextInput
+                onChangeText={(text) => addNewSkill(text)}
                 style={styles.input}
                 placeholder="Search"
                 placeholderTextColor="lightgray"
             />
-            <View style={styles.skillsContainer}>
-                {skills.map((skill, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={[
-                            styles.skillButton,
-                            {
-                                backgroundColor: selectedSkills.includes(skill) ? '#186ade' : '#dce3e8',
-                            },
-                        ]}
-                        onPress={() => toggleSkillSelection(skill)}
-                    >
-                        <Text style={[styles.skillButtonText, { color: selectedSkills.includes(skill) ? 'white' : '#3e5463' }]}>
-                            {skill}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
+            {loading ? (
+                <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
+            ) : (
+                <ScrollView contentContainerStyle={styles.skillsContainer}>
+                    {skills.map((skill, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={[
+                                styles.skillButton,
+                                {
+                                    backgroundColor: selectedSkills.includes(skill) ? '#186ade' : '#dce3e8',
+                                },
+                            ]}
+                            onPress={() => toggleSkillSelection(skill)}
+                        >
+                            <Text style={[styles.skillButtonText, { color: selectedSkills.includes(skill) ? 'white' : '#3e5463' }]}>
+                                {skill}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            )}
             <View style={styles.navigationButtonsContainer}>
                 <TouchableOpacity style={[styles.navigationButton, { backgroundColor: '#0047D2' }]} onPress={navigateToProfilecreatedPage}>
                     <Text style={styles.navigationButtonText}>Finish</Text>
@@ -98,7 +151,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'black',
         marginTop: 50,
-        marginBottom:20,
+        marginBottom: 20,
     },
     input: {
         width: '100%',
@@ -113,6 +166,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         marginBottom: 20,
+        width: '100%',
     },
     skillButton: {
         paddingHorizontal: 15,
@@ -125,9 +179,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     navigationButtonsContainer: {
+        backgroundColor: 'white',
+        paddingTop: 10,
         flexDirection: 'column',
         marginTop: 'auto',
         alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#ccc',
+        width: 'auto',
     },
     navigationButton: {
         backgroundColor: '#0047D2',
@@ -135,11 +194,16 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         marginBottom: 10,
-        width:'100%',
+        width: '100%',
     },
     navigationButtonText: {
         color: 'white',
         textAlign: 'center',
         fontSize: 16,
     },
+    loadingSpin: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
 });

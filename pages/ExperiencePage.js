@@ -6,30 +6,35 @@ import { db } from '../config/firebase';
 
 export default function ExperiencePage({route}) {
     const userID = route.params?.userID;
+    const addedNewExperience = route.params?.addedNewExperience;
     const [experiences, setExperiences] = useState([]);
 
-    useEffect(() => {
-        const fetchExperiences = async () => {
-            const userDocRef = doc(db, 'users', userID);
-        
-            try {
-                const userDocSnapshot = await getDoc(userDocRef);
-                
-                // Check if user document exists
-                if (userDocSnapshot.exists()) {
-                    const userData = userDocSnapshot.data();
-                    const experiencesList = userData.experiences || []; // Initialize experiences array if it doesn't exist
-                    setExperiences(experiencesList);
-                } else {
-                    console.error("User document does not exist!");
-                    setExperiences([]);
-                }
-            } catch (error) {
-                console.error("Error fetching user document:", error);
+    const fetchExperiences = async () => {
+        const userDocRef = doc(db, 'users', userID);
+    
+        try {
+            const userDocSnapshot = await getDoc(userDocRef);
+            
+            // Check if user document exists
+            if (userDocSnapshot.exists()) {
+                const userData = userDocSnapshot.data();
+                const experiencesList = userData.experiences || []; // Initialize experiences array if it doesn't exist
+                setExperiences(experiencesList);
+            } else {
+                console.error("User document does not exist!");
                 setExperiences([]);
             }
-        };
+        } catch (error) {
+            console.error("Error fetching user document:", error);
+            setExperiences([]);
+        }
+    };
 
+    if (addedNewExperience) {
+        fetchExperiences();
+    }
+
+    useEffect(() => {
         fetchExperiences();
     }, []);
 

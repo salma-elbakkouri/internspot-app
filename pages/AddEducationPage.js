@@ -45,7 +45,7 @@ export default function AddEducationPage({ route }) {
     const navigation = useNavigation();
 
     const handleCancel = () => {
-        navigation.goBack();
+        navigation.navigate('EducationPage', { userID, addedNewEducation: true});
     };
 
     const handleSubmit = async () => {
@@ -86,7 +86,7 @@ export default function AddEducationPage({ route }) {
         setDegree('');
         setSpecialization('');
     
-        navigation.goBack();
+        navigation.navigate('EducationPage', { userID, addedNewEducation: true});
     };
      
 

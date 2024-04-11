@@ -80,7 +80,7 @@ export default function AddExperiencePage({route}) {
         } catch (error) {
             console.error("Error fetching user document:", error);
         }
-        navigation.goBack();
+        navigation.navigate('ExperiencePage', { userID, addedNewExperience: true });
     };
 
     return (

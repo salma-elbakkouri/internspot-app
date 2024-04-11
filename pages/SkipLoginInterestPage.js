@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore/lite';
 import { db } from '../config/firebase';
@@ -9,10 +9,47 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SkipLoginInterestPage({ route }) {
   const skiped = route.params.skiped;
   const user = route.params?.user;
+  const OfferdetailPageRedirect = route.params?.OfferdetailPageRedirect;
+
   const navigation = useNavigation(); 
 
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hisfirstlaunch, sethisfirstlaunch] = useState(true);
+  const [defaultInterests, setDefaultInterests] = useState([]);
+
+  const isFirstlaunch = async () => {
+    AsyncStorage.getItem('firstlaunch').then((value) => {
+      if (value == null) {
+        AsyncStorage.setItem('firstlaunch', 'false');
+        sethisfirstlaunch(true);
+      } else {
+        sethisfirstlaunch(false);
+        navigation.navigate('Home', {skiped: true});
+      }
+    });
+  }
+
+  useEffect( async () => {
+    const isUserComeFromOfferPage = async () => {
+      if (OfferdetailPageRedirect) {
+        const interestsJson = await AsyncStorage.getItem('interests');
+        const savedInterests = JSON.parse(interestsJson);
+  
+        await addDoc(collection(db, 'users'), {
+          email: user.email,
+          interests: savedInterests,
+        });
+  
+        navigation.navigate('OfferdetailPage', { 
+          offer: route.params.offer,
+          comeFromLoginPage: true,
+        });
+      }
+    };
+    
+    isUserComeFromOfferPage();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,10 +60,11 @@ export default function SkipLoginInterestPage({ route }) {
           interestsData.push(doc.data().name);
         });
         setInterests(interestsData);
-        setLoading(false); // Set loading to false after data is fetched
+        setDefaultInterests(interestsData);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching interests:', error);
-        setLoading(false); // Set loading to false in case of error
+        setLoading(false);
       }
     };
     fetchData();
@@ -47,18 +85,15 @@ export default function SkipLoginInterestPage({ route }) {
   };
 
   navigateToHomePage = () => {
-    if (skiped) {
-      AsyncStorage.setItem('interests', JSON.stringify(selectedInterests))
-        .then(() => {
-          console.log('Selected Interests:', selectedInterests);
-          navigation.navigate('Home', { skiped: true }); // Pass skiped: true
-        })
-        .catch((error) => {
-          console.error('Error setting interests:', error);
-        });
-    } else {
-      navigation.navigate('Home', { skiped: false }); // Pass skiped: false
-    }
+    AsyncStorage.setItem('interests', JSON.stringify(selectedInterests))
+      .then(() => {
+        console.log('Selected Interests:', selectedInterests);
+        AsyncStorage.setItem('firstlaunch', 'false');
+        navigation.navigate('Home', { skiped: true });
+      })
+      .catch((error) => {
+        console.error('Error setting interests:', error);
+      });
   };
 
   navigateProsileSetupPage = async () => {
@@ -70,15 +105,32 @@ export default function SkipLoginInterestPage({ route }) {
     navigation.navigate('ProfilesetupPage', { user });
   };
 
+  const filterSkills = (val) => {
+    if (val !== '') {
+      console.log('Filtering skills:', val);
+      // Filter the interests array based on the search value (val)
+      const filteredInterests = defaultInterests.filter((interest) =>
+        interest.toLowerCase().includes(val.toLowerCase())
+      );
+      // Update the interests state with the filtered array
+      setInterests(filteredInterests);
+    } else {
+      // If the search value is empty, return data to default
+      // Set interests back to its default state (assuming it's initialized with the default data)
+      setInterests(defaultInterests);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Let's choose your interest!</Text>
       <TextInput
         style={styles.input}
+        onChangeText={(val) => filterSkills(val)}
         placeholder="Search"
         placeholderTextColor="lightgray"
       />
-      <View style={styles.interestsContainer}>
+      <ScrollView style={styles.interestsContainer}>
         <View style={styles.checkboxContainer}>
         {loading ? (
             <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
@@ -98,14 +150,11 @@ export default function SkipLoginInterestPage({ route }) {
             </View>
           )}
         </View>
-      </View>
+      </ScrollView>
       <TouchableOpacity
         style={styles.continueButton}
         onPress={() => {
           if (selectedInterests.length > 0) {
-            // Navigate to HomePage
-            // Replace 'HomePage' with the actual name of your HomePage component
-            // navigation.navigate('Home');
             skiped ? navigateToHomePage() : navigateProsileSetupPage();
           } else {
             // Show popup
@@ -128,7 +177,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-around', // Push elements to the top and bottom
+    justifyContent: 'space-around',
     paddingHorizontal: 20,
     backgroundColor: '#fff',
   },
@@ -146,11 +195,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 20,
-    elevation: 2, // Add elevation for shadow
+    elevation: 2,
   },
   interestsContainer: {
     width: '100%',
-    flexGrow: 1, // Take up remaining space
+    maxHeight: '72%',
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -171,10 +220,10 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   selected: {
-    backgroundColor: '#0047D2', // Background color when selected
+    backgroundColor: '#0047D2',
   },
   selectedText: {
-    color: '#fff', // text color when selected
+    color: '#fff',
   },
   continueButton: {
     width: '100%',
@@ -189,22 +238,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  //icon to add when interest is selected (implement later)
-  removeIconContainer: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    backgroundColor: 'white',
-    borderRadius: 50,
-    width: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeIcon: {
-    color: 'black',
-    fontSize: 14,
   },
   loadingSpin: {
     flex: 1,

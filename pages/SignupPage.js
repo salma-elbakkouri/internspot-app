@@ -5,8 +5,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { auth, createUserWithEmailAndPassword, sendEmailVerification } from '../config/firebase'; // Import sendEmailVerification
 
-export default function SignupPage() {
+export default function SignupPage({route}) {
   const navigation = useNavigation();
+  const OfferdetailPageRedirect = route.params?.OfferdetailPageRedirect;
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -58,13 +59,17 @@ export default function SignupPage() {
   
       // Send verification email
       await sendEmailVerification(user);
-  
-      // Show success message
-      // Alert.alert('Success', 'Sign-up successful, please verify your email to be able to login.');
-  
-      // navigation.navigate('Login'); 
-      // console.log('User signed up:', user);
-      navigation.navigate('SkipLoginInterestPage', {skiped: false, user: user});
+      
+      if (OfferdetailPageRedirect) {
+        navigation.navigate('SkipLoginInterestPage', {
+          skiped: false,
+          user: user,
+          OfferdetailPageRedirect: true,
+          offer: route.params.offer,
+        });
+      }else{
+        navigation.navigate('SkipLoginInterestPage', {skiped: false, user: user});
+      }
     } catch (error) {
       console.error('Error signing up:', error.message);
       Alert.alert('Error', 'Failed to sign up. Please try again.');

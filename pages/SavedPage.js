@@ -1,93 +1,203 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import BottomTabBar from '../components/BottomTabBar'; // Import BottomTabBar component
+import BottomTabBar from '../components/BottomTabBar';
+import { auth } from '../config/firebase';
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite';
+import { db } from '../config/firebase';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SavedPage({ navigation, route }) {
-  // const savedItems = route.params?.savedItems || [];
-  const [savedItems, setSavedItems] = useState([
-    { id: '1', posted: '5 days ago', title: 'Junior UX Designer', duration: '6 months', type: 'Full Time Hybrid', company: 'Amazon', location: 'Sale Rabat, Morocco' },
-    { id: '2', posted: '1 hour ago', title: 'Software Engineer', duration: '12 months', type: 'Remote', company: 'Google', location: 'Mountain View, CA' },
-    { id: '3', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-    { id: '4', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-    { id: '5', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-    { id: '6', posted: '2 mins ago', title: 'Marketing Specialist', duration: '3 months', type: 'Part Time', company: 'Facebook', location: 'Menlo Park, CA' },
-  ]);
+  const navigation1 = useNavigation();
+  const [offers, setOffers] = useState([]);
+  const [hideOffers, setHideOffers] = useState(true);
+  const [offersIds, setOffersIds] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+        setIsUserLoggedIn(true);
+      } else {
+        setIsUserLoggedIn(false);
+      }
+    });
 
-  const toggleSelection = (id) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(item => item !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (isUserLoggedIn) {
+      fetchSavedOffers();
+      setHideOffers(false);
     }
+  }, [isUserLoggedIn]);
 
-    // Remove the item from savedItems if it exists
-    const index = savedItems.findIndex(item => item.id === id);
-    if (index !== -1) {
-      const newSavedItems = [...savedItems];
-      newSavedItems.splice(index, 1);
-      setSavedItems(newSavedItems);
+  const fetchSavedOffers = async () => {
+    try {
+      const offersIdArray = [];
+
+      const q = query(collection(db, 'users'), where('email', '==', user.email));
+      const querySnapshot = await getDocs(q);
+
+      // Using map instead of forEach to directly extract the savedOffers arrays
+      querySnapshot.forEach(doc => {
+        offersIdArray.push(doc.data().savedOffers);
+      });
+
+      // Flattening the array using concat() method
+      const flatOffersArray = [].concat(...offersIdArray);
+
+      setOffersIds(flatOffersArray);
+
+      // Use a more descriptive name for clarity
+      const fetchedOffers = await Promise.all(flatOffersArray.map(async id => {
+        const docRef = doc(db, 'offers', id);
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+      }));
+
+      console.log('Fetched Offers: ', fetchedOffers.length);
+      setOffers(fetchedOffers);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching offers: ', error);
     }
   };
 
+  const toggleSelection = async (id) => {
+    try {
+      // Filter out the selected ID from the offersIds array
+      const updatedOffersIds = offersIds.filter(offerId => offerId !== id);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.offerContainer}>
-      <TouchableOpacity style={styles.saveIconContainer} onPress={() => toggleSelection(item.id)}>
-        <FontAwesome name="bookmark" size={24} color="black" />
-      </TouchableOpacity>
+      // Update the state with the new array
+      setOffersIds(updatedOffersIds);
 
-      <View style={styles.offerContent}>
-        <Text style={styles.postedText}>{item.posted}</Text>
-        <Text style={styles.titleText}>{item.title}</Text>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.durationText}>{item.duration}</Text>
-          <View style={styles.typeContainer}>
-            <Text style={styles.typeText}>{item.type}</Text>
+      // Retrieve the document reference
+      const q = query(collection(db, 'users'), where('email', '==', user.email));
+      const querySnapshot = await getDocs(q);
+      const docRef = querySnapshot.docs[0].ref;
+
+      // Update the document with the new offersIds
+      await updateDoc(docRef, {
+        savedOffers: updatedOffersIds,
+      });
+
+      // After updating the document, fetch the saved offers again
+      fetchSavedOffers();
+    } catch (error) {
+      console.error('Error toggling selection: ', error);
+    }
+  };
+
+  const handleOfferPress = (offer) => {
+    navigation1.navigate('OfferdetailPage', { offer });
+  };
+
+  const filterPageNavigate = () => {
+    navigation1.navigate('FilterOffersPage');
+  }
+
+  const renderItem = ({ item }) => {
+    const index = offers.indexOf(item);
+    const key = item.id + '-' + index;
+    // Convert Posted_Date string to Date object
+    const postedDate = new Date(item.general_info.Posted_Date);
+
+    // Get the current date and time
+    const currentDate = new Date();
+
+    // Calculate the time difference in milliseconds
+    const timeDifference = currentDate - postedDate;
+
+    // Convert milliseconds to seconds, minutes, hours, and days
+    const secondsDifference = Math.floor(timeDifference / 1000);
+    const minutesDifference = Math.floor(secondsDifference / 60);
+    const hoursDifference = Math.floor(minutesDifference / 60);
+    const daysDifference = Math.floor(hoursDifference / 24);
+
+    // Determine the appropriate time unit to display
+    let timeAgo;
+    if (daysDifference > 0) {
+      timeAgo = `${daysDifference} day${daysDifference > 1 ? 's' : ''} ago`;
+    } else if (hoursDifference > 0) {
+      timeAgo = `${hoursDifference} hour${hoursDifference > 1 ? 's' : ''} ago`;
+    } else if (minutesDifference > 0) {
+      timeAgo = `${minutesDifference} minute${minutesDifference > 1 ? 's' : ''} ago`;
+    } else {
+      timeAgo = `${secondsDifference} second${secondsDifference > 1 ? 's' : ''} ago`;
+    }
+
+    return (
+      <View style={styles.offerContainer}>
+        <TouchableOpacity style={styles.saveButton} onPress={() => toggleSelection(item.id)}>
+          <FontAwesome name="bookmark" size={24}
+            color={'black'}
+          ></FontAwesome>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleOfferPress(item)}>
+          <View style={styles.offerContent}>
+            <Text style={styles.postedText}>Posted {timeAgo}</Text>
+            <Text style={styles.titleText}>{item.title}</Text>
+            <View style={styles.detailsContainer}>
+              <Text style={styles.durationText}>Salaire  -</Text>
+              <View style={styles.typeContainer}>
+                <Text style={styles.typeText}>{item.additional_info.Salaire}</Text>
+              </View>
+            </View>
+            <View style={styles.companyContainer}>
+              <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
+              <View style={styles.companyDetails}>
+                <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
+                <Text style={styles.location}>{item.general_info.City}</Text>
+              </View>
+            </View>
           </View>
-        </View>
-        <View style={styles.companyContainer}>
-          {/* Assuming you have image assets for companies */}
-          <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
-          <View style={styles.companyDetails}>
-            <Text style={styles.companyName}>{item.company}</Text>
-            <Text style={styles.location}>{item.location}</Text>
-          </View>
-        </View>
+        </TouchableOpacity>
       </View>
-    </View>
-  );
-
+    );
+  };
 
   return (
     <View style={styles.container}>
       {/* Search input and filter button */}
       <View style={styles.searchContainer}>
-        <TextInput
+        <TextInput onPressIn={filterPageNavigate}
           style={styles.searchInput}
           placeholder="Search"
           placeholderTextColor="lightgray"
         />
-        <TouchableOpacity style={styles.filterButton}>
-          <Image source={require('../assets/filtericon.png')} style={styles.filterIcon} />
-        </TouchableOpacity>
+        {/* <TouchableOpacity onPress={navigateToFilterPage} style={styles.filterButton}>
+          <Image source={require('../assets/filtericon.png')} tintColor={'white'} style={styles.filterIcon} />
+        </TouchableOpacity> */}
       </View>
       {/* Recent offers text */}
       <Text style={styles.recentOffersText}>Saved Offers</Text>
-      {/* Flatlist for saved offers */}
-      <FlatList
-        data={savedItems}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={{ paddingBottom: 60 }}
-      />
+      {!isUserLoggedIn ?
+        <Text style={{ textAlign: 'center' }}>No saved offers</Text>
+        :
+        loading ? (
+          <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
+        ) : (
+          <FlatList
+            data={offers}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 60 }}
+          />
+        )
+      }
+
       {/* Bottom tab bar with navigation prop */}
       <BottomTabBar navigation={navigation} />
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -101,20 +211,10 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   searchInput: {
-    flex: 1,
-    height: 40,
-    paddingHorizontal: 15,
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
     borderRadius: 10,
-    backgroundColor: 'white',
-    color: 'black',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-    elevation: 1,
   },
   filterButton: {
     padding: 8,
@@ -198,4 +298,16 @@ const styles = StyleSheet.create({
   location: {
     color: '#4A4A4A',
   },
+  saveButton: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    padding: 8,
+    borderRadius: 50,
+  },
+  loadingSpin: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });

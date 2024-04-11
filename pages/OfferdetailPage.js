@@ -1,54 +1,143 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { auth } from '../config/firebase';
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite';
+import { db } from '../config/firebase';
 
 const OfferdetailsPage = ({ route, navigation }) => {
-    const { offer } = route.params;
+    const { offer, comeFromLoginPage } = route.params;
 
-    const [applied, setApplied] = React.useState(true);
-    // const handelApplyPage = () => {
-    //     navigation.navigate('ApplyFormPage', { offer });
-    // }
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+    const [applied, setApplied] = React.useState(false);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (user) {
+                setUser(user);
+                setIsUserLoggedIn(true);
+            } else {
+                setIsUserLoggedIn(false);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogin = () => {
+        console.log('Redirect to login page');
+        navigation.navigate('Login', { OfferdetailPageRedirect: true, offer: offer });
+    };
+
+    const handleCancel = () => {
+        console.log('Cancel pressed');
+    };
+
     const handelApplyPage = () => {
-        navigation.navigate('ApplyWebView', { url: `https://www.marocannonces.com/${offer.apply_link}` });
-        setApplied(true);
+        if (isUserLoggedIn) {
+            navigation.navigate('ApplyWebView', { url: `https://www.marocannonces.com/${offer.apply_link}` });
+            setApplied(true);
+        } else {
+            Alert.alert(
+                'Error',
+                'Please login to apply to this offer.',
+                [
+                    {
+                        text: 'Login',
+                        onPress: handleLogin,
+                    },
+                    {
+                        text: 'Cancel',
+                        onPress: handleCancel,
+                        style: 'cancel',
+                    },
+                ],
+                { cancelable: false }
+            );
+        }
     }
 
     const handleGoBack = () => {
-        console.log('Go back');
-        navigation.goBack();
+        if (comeFromLoginPage) {
+            navigation.navigate('Home', { skiped: false });
+        } else {
+            navigation.goBack();
+        }
     };
 
-    // Function to handle saving/un-saving offer
     const handleSaveOffer = () => {
-        // Your logic for saving/un-saving offer goes here
+        if (isUserLoggedIn) {
+            console.log('Offer saved');
+        } else {
+            Alert.alert(
+                'Error',
+                'Please login to apply to this offer.',
+                [
+                    {
+                        text: 'Login',
+                        onPress: handleLogin,
+                    },
+                    {
+                        text: 'Cancel',
+                        onPress: handleCancel,
+                        style: 'cancel',
+                    },
+                ],
+                { cancelable: false }
+            );
+        }
     };
 
-    // Convert Posted_Date string to Date object
+    const handelOfferApplied = async () => {
+        try {
+            const q = query(collection(db, 'users'), where('email', '==', user.email));
+            const querySnapshot = await getDocs(q);
+            const userData = querySnapshot.docs[0].data();
+            const appliedOffers = userData.appliedOffers || [];
+            const docRef = querySnapshot.docs[0].ref;
+    
+            // Check if the offer ID already exists in the appliedOffers array
+            if (!appliedOffers.includes(offer.id)) {
+                // If the offer ID is not already in the array, push it
+                appliedOffers.push(offer.id);
+    
+                // Update the document with the updated appliedOffers array
+                await updateDoc(docRef, {
+                    appliedOffers: appliedOffers,
+                });
+    
+                setApplied(false);
+            } else {
+                // If the offer ID already exists, you can handle it here (maybe show a message or perform some other action)
+                console.log('Offer already applied');
+                setApplied(false);
+            }
+        } catch (error) {
+            console.error('Error applying offer: ', error);
+            setApplied(false);
+        }
+    };    
+
     const postedDate = new Date(offer.general_info.Posted_Date);
-  
-    // Get the current date and time
     const currentDate = new Date();
-  
-    // Calculate the time difference in milliseconds
+
     const timeDifference = currentDate - postedDate;
-  
-    // Convert milliseconds to seconds, minutes, hours, and days
+
     const secondsDifference = Math.floor(timeDifference / 1000);
     const minutesDifference = Math.floor(secondsDifference / 60);
     const hoursDifference = Math.floor(minutesDifference / 60);
     const daysDifference = Math.floor(hoursDifference / 24);
-  
-    // Determine the appropriate time unit to display
+
     let timeAgo;
     if (daysDifference > 0) {
-      timeAgo = `${daysDifference} day${daysDifference > 1 ? 's' : ''} ago`;
+        timeAgo = `${daysDifference} day${daysDifference > 1 ? 's' : ''} ago`;
     } else if (hoursDifference > 0) {
-      timeAgo = `${hoursDifference} hour${hoursDifference > 1 ? 's' : ''} ago`;
+        timeAgo = `${hoursDifference} hour${hoursDifference > 1 ? 's' : ''} ago`;
     } else if (minutesDifference > 0) {
-      timeAgo = `${minutesDifference} minute${minutesDifference > 1 ? 's' : ''} ago`;
+        timeAgo = `${minutesDifference} minute${minutesDifference > 1 ? 's' : ''} ago`;
     } else {
-      timeAgo = `${secondsDifference} second${secondsDifference > 1 ? 's' : ''} ago`;
+        timeAgo = `${secondsDifference} second${secondsDifference > 1 ? 's' : ''} ago`;
     }
 
     return (
@@ -65,16 +154,30 @@ const OfferdetailsPage = ({ route, navigation }) => {
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {/* Offer picture */}
-                <Image 
-                    source={{ uri: 'https://images.squarespace-cdn.com/content/v1/535552d9e4b0021ca53b2d3d/1596746988776-YA89SSJGLKP59NQLDNEO/Random_Branding_Logo.gif' }} 
-                    style={styles.offerPicture} 
-                    resizeMode="contain" 
+                <Image
+                    source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }}
+                    style={styles.offerPicture}
+                    resizeMode="contain"
                 />
 
                 {/* Offer details */}
                 <Text style={styles.companyName}>{offer.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{offer.general_info.City}</Text>
                 <Text style={styles.offerTitle}>{offer.title}</Text>
+
+                {applied ?
+                    <View style={styles.appliedBlock}>
+                        <Text style={styles.appliedBlockTitle}>This you Apply to this Offer ?</Text>
+                        <View style={styles.appliedBlockButtons}>
+                            <TouchableOpacity style={styles.appliedBlockBtn} onPress={handelOfferApplied}>
+                                <Text style={styles.appliedBlockBtnText}>Yes</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.appliedBlockBtn} onPress={() => { setApplied(false) }}>
+                                <Text style={styles.appliedBlockBtnText}>No</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    : null}
 
                 {/* More details */}
                 <View style={styles.moreDetails}>
@@ -217,6 +320,29 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginLeft: 20,
         marginBottom: 10,
+    },
+    appliedBlock: {
+        padding: 20,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'transparent',
+    },
+    appliedBlockTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    appliedBlockButtons: {
+        flexDirection: 'row',
+        marginTop: 10,
+    },
+    appliedBlockBtnText: {
+        fontSize: 16,
+        color: '#0047D2',
+        fontWeight: 'bold',
+    },
+    appliedBlockBtn: {
+        marginHorizontal: 5,
     },
 });
 

@@ -23,15 +23,18 @@ import OfferdetailPage from './pages/OfferdetailPage';
 import ApplicationdetailPage from './pages/ApplicationdetailPage';
 import MessagereceiverPage from './pages/MessagereceiverPage';
 import ApplyFormPage from './pages/ApplyFormPage';
+import FilterOffersPage from './pages/FilterOfferPage';
 import ApplyWebView from './pages/ApplyWebView';
-import { auth } from './config/firebase'; // Import Firebase auth
-
+import { auth } from './config/firebase';
+import FilterOptionsPage from './pages/FilterOptionsPage'; 
+import FilterOffersResults from './pages/FilterOffersResults';
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
+      <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Main" component={MainScreen} />
         <Stack.Screen name="Welcome" component={WelcomePage} options={{ title: 'Welcome Page' }} />
@@ -55,6 +58,9 @@ export default function App() {
         <Stack.Screen name="MessagereceiverPage" component={MessagereceiverPage}  />
         <Stack.Screen name="ApplyFormPage" component={ApplyFormPage}  />
         <Stack.Screen name="ApplyWebView" component={ApplyWebView} />
+        <Stack.Screen name="FilterOffersPage" component={FilterOffersPage} />
+        <Stack.Screen name="FilterOptionsPage" component={FilterOptionsPage} />
+        <Stack.Screen name="FilterOffersResults" component={FilterOffersResults} />
         
       </Stack.Navigator>
     </NavigationContainer>
@@ -90,7 +96,6 @@ function MainScreen({ navigation }) {
           style={styles.logo}
         />
       </TouchableOpacity>
-      <StatusBar style="auto" />
     </View>
   );
 }

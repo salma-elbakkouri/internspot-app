@@ -6,8 +6,28 @@ export default function ApplicationPage({ navigation }) {
   const applications = [
     { id: '1', status: 'Application Sent', title: 'Junior UX Designer', company: 'Amazon' },
     { id: '2', status: 'Application Accepted', title: 'Software Engineer', company: 'Google' },
-    { id: '3', status: 'Application Rejected', title: 'Marketing Specialist', company: 'Facebook' },
+    { id: '3', status: 'Application Rejected', title: 'Marketing Specialist', company: 'Oracle' },
   ];
+
+  const appliedOffers = ({ item }) => (
+    <View style={styles.applicationContainer}>
+      {/* Amazon Icon */}
+      <Image source={require('../assets/amazon.jpg')} style={styles.companyIcon} />
+      {/* Application details */}
+      <TouchableOpacity>
+        <View style={styles.applicationDetails}>
+          <Text style={styles.applicationTitle}>{item.title}</Text>
+          <Text style={styles.companyName}>{item.company}</Text>
+          {/* Application status */}
+          {/* <View style={[styles.applicationStatus, getStatusStyle(item.status)]}>
+          <Text style={[styles.statusText, getStatustextStyle(item.status)]}>{item.status}</Text>
+        </View> */}
+        </View>
+        {/* Arrow Icon */}
+        {/* <Image source={require('../assets/arrow.png')} style={styles.arrowIcon} /> */}
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -26,23 +46,7 @@ export default function ApplicationPage({ navigation }) {
       {/* Flatlist for applications */}
       <FlatList
         data={applications}
-        renderItem={({ item }) => (
-          <View style={styles.applicationContainer}>
-            {/* Amazon Icon */}
-            <Image source={require('../assets/amazon.jpg')} style={styles.companyIcon} />
-            {/* Application details */}
-            <View style={styles.applicationDetails}>
-              <Text style={styles.applicationTitle}>{item.title}</Text>
-              <Text style={styles.companyName}>{item.company}</Text>
-              {/* Application status */}
-              <View style={[styles.applicationStatus, getStatusStyle(item.status)]}>
-                <Text style={[styles.statusText, getStatustextStyle(item.status)]}>{item.status}</Text>
-              </View>
-            </View>
-            {/* Arrow Icon */}
-            <Image source={require('../assets/arrow.png')} style={styles.arrowIcon} />
-          </View>
-        )}
+        renderItem={appliedOffers}
         keyExtractor={item => item.id}
         contentContainerStyle={{ paddingBottom: 60 }}
       />
@@ -182,6 +186,6 @@ const styles = StyleSheet.create({
   arrowIcon: {
     width: 32,
     height: 32,
-    marginTop:15,
+    marginTop: 15,
   },
 });

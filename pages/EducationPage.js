@@ -6,32 +6,37 @@ import { db } from '../config/firebase';
 
 export default function EducationPage({ route }) {
     const userID = route.params?.userID;
+    const addedNewEducation = route.params?.addedNewEducation;
     const [educations, setEducations] = useState([]);
 
-    useEffect(() => {
-        const fetchEducations = async () => {
-            const userDocRef = doc(db, 'users', userID);
-        
-            try {
-                const userDocSnapshot = await getDoc(userDocRef);
-                
-                // Check if user document exists
-                if (userDocSnapshot.exists()) {
-                    const userData = userDocSnapshot.data();
-                    const educationsList = userData.educations || []; // Initialize educations array if it doesn't exist
-                    setEducations(educationsList);
-                } else {
-                    console.error("User document does not exist!");
-                    setEducations([]);
-                }
-            } catch (error) {
-                console.error("Error fetching user document:", error);
+    const fetchEducations = async () => {
+        const userDocRef = doc(db, 'users', userID);
+    
+        try {
+            const userDocSnapshot = await getDoc(userDocRef);
+            
+            // Check if user document exists
+            if (userDocSnapshot.exists()) {
+                const userData = userDocSnapshot.data();
+                const educationsList = userData.educations || []; // Initialize educations array if it doesn't exist
+                setEducations(educationsList);
+            } else {
+                console.error("User document does not exist!");
                 setEducations([]);
             }
-        };
+        } catch (error) {
+            console.error("Error fetching user document:", error);
+            setEducations([]);
+        }
+    };
 
+    useEffect(() => {
         fetchEducations();
     }, []);
+
+    if (addedNewEducation) {
+        fetchEducations();
+    }
 
     const navigation = useNavigation();
 

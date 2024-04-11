@@ -6,30 +6,27 @@ import { auth, signInWithEmailAndPassword } from '../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-export default function LoginPage() {
-  const [hisfirstlaunch, sethisfirstlaunch] = useState(true);
-
-  AsyncStorage.getItem('firstlaunch').then((value) => {
-    if (value == null) {
-      AsyncStorage.setItem('firstlaunch', 'false'); // No need to wait for `setItem` to finish, so no await
-      sethisfirstlaunch(true);
-    } else {
-      sethisfirstlaunch(false);
-    }
-  });
-
+export default function LoginPage({route}) {
   const navigation = useNavigation();
+  const OfferdetailPageRedirect = route.params?.OfferdetailPageRedirect;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [hidePassword, setHidePassword] = useState(true);
 
   const navigateToSignup = () => {
-    navigation.navigate('Signup'); //navigate to sign-up page 
+    if (OfferdetailPageRedirect) {
+      navigation.navigate('Signup', {
+        OfferdetailPageRedirect: true,
+        offer: route.params.offer,
+      }); //navigate to sign-up page 
+    }else {
+      navigation.navigate('Signup'); //navigate to sign-up page
+    }
   };
 
   const navigateToSkipLoginInterestPage = () => {
-    navigation.navigate('SkipLoginInterestPage', {skiped: false}); // navigate to skip login interest page
+    navigation.navigate('SkipLoginInterestPage', {skiped: true}); // navigate to skip login interest page
   };
 
   const navigateToHomePage = () => {
@@ -39,6 +36,13 @@ export default function LoginPage() {
   const togglePasswordVisibility = () => {
     setHidePassword(!hidePassword);
   };
+
+  const navigateToOfferPage = () => {
+    navigation.navigate('OfferdetailPage', { 
+      offer: route.params.offer,
+      comeFromLoginPage: true,
+     });
+  }
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -50,7 +54,14 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const userData = userCredential.user;
       // Alert.alert('Success', 'Login successful.');
-      navigation.navigate('Home', { user: userData });
+      setEmail('');
+      setPassword('');
+      setHidePassword(true);
+      if (OfferdetailPageRedirect) {
+        navigateToOfferPage();
+        return;
+      }
+      navigation.navigate('Home', { user: userData, skiped: false });
     } catch (error) {
       console.error('Error signing in:', error.message);
       Alert.alert('Error', 'Failed to sign in. Please try again.');
@@ -97,7 +108,7 @@ export default function LoginPage() {
           </TouchableOpacity>
         </View>
         <Text style={styles.signUpText}>Don't Have An Account? <Text style={styles.signUpLink} onPress={navigateToSignup}>Sign up</Text></Text>
-        <TouchableOpacity style={styles.skipButton} onPress={hisfirstlaunch ? navigateToSkipLoginInterestPage : navigateToHomePage}>
+        <TouchableOpacity style={styles.skipButton} onPress={navigateToSkipLoginInterestPage}>
           <Text style={styles.skipButtonText}>Skip this step</Text>
         </TouchableOpacity>
       </ImageBackground>

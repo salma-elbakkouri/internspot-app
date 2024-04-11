@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
@@ -9,9 +9,9 @@ import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, u
 import { db } from '../config/firebase';
 
 
-
 export default function Home({ navigation, route }) {
   const skiped = route.params?.skiped;
+  const userData = route.params?.user || null;
 
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,8 +19,22 @@ export default function Home({ navigation, route }) {
   const [selectedItems, setSelectedItems] = useState([]);
   const [savedItems, setSavedItems] = useState([]);
   const [data, setData] = useState([]);
-
+  const [userSavedOffers, setUserSavedOffers] = useState([]);
   const [user, setUser] = useState(null);
+
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsUserLoggedIn(true);
+      } else {
+        setIsUserLoggedIn(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -28,18 +42,16 @@ export default function Home({ navigation, route }) {
         setUser(user);
         fetchUserData(user.email);
       } else {
-        // Handle case when user is not signed in
-        // Alert.alert('Error', 'User not signed in.');
-        // Optionally, you can navigate to the login screen here
-        // navigation.navigate('Login');
         const fetchInterests = async () => {
           if (skiped) {
             try {
               const interestsJson = await AsyncStorage.getItem('interests');
               if (interestsJson !== null) {
                 const interests = JSON.parse(interestsJson);
-                console.log('Retrieved Interests:', interests); // Debugging
                 // Set your state with the fetched interests
+                fetchHomeOffers(interests);
+              } else {
+                console.log('No interests found in AsyncStorage');
               }
             } catch (error) {
               console.error('Error fetching interests:', error);
@@ -48,7 +60,7 @@ export default function Home({ navigation, route }) {
             console.log('User has not skipped the interests page');
           }
         };
-      
+
         fetchInterests();
       }
     });
@@ -56,36 +68,65 @@ export default function Home({ navigation, route }) {
     return () => unsubscribe(); // Cleanup function
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await loadSavedOffers();
+    };
+
+    fetchData();
+  }, []);
+
+  const loadSavedOffers = async () => {
+    if (isUserLoggedIn) {
+      const userRef = collection(db, 'users');
+
+      try {
+        const userQuerySnapshot = await getDocs(query(userRef, where('email', '==', user.email)));
+
+        if (!userQuerySnapshot.empty) {
+          // Assuming there's only one document for each user email
+          const userData = userQuerySnapshot.docs[0].data();
+
+          // Use userData as needed
+          console.log('User offers:', userData.savedOffers.flat());
+          setUserSavedOffers(userData.savedOffers.flat());
+        } else {
+          console.log('No user found with email:', user.email);
+        }
+      } catch (error) {
+        console.error("Error fetching user offers:", error);
+      }
+    }
+  };
+
   const fetchHomeOffers = async (interests) => {
-    console.log('Fetching home offers for interests:', interests);
-  
     try {
       const offers = [];
-  
+
       // Construct a Firestore query for each interest and parameter
       for (const interest of interests) {
         if (interest) {
           const dataOffers = await getDocs(collection(db, 'offers'));
-  
+
           dataOffers.forEach((doc) => {
             const { title, additional_info, description } = doc.data();
-  
-            if (title.includes(interest) || 
-                (additional_info?.Fonction?.includes(interest) || additional_info?.Domaine?.includes(interest)) || 
-                description.includes(interest)) {
+
+            if (title.includes(interest) ||
+              (additional_info?.Fonction?.includes(interest) || additional_info?.Domaine?.includes(interest)) ||
+              description.includes(interest)) {
               offers.push({ id: doc.id, ...doc.data() });
             }
           });
         }
       }
-  
+
       // Sort offers by Posted_Date from newest to oldest
       offers.sort((a, b) => new Date(b.general_info.Posted_Date) - new Date(a.general_info.Posted_Date));
-  
+
       // Set data and loading state after all offers have been fetched and sorted
       setData(offers);
       setLoading(false);
-  
+
     } catch (error) {
       console.error('Error fetching home offers:', error);
       // Handle error as needed
@@ -106,7 +147,7 @@ export default function Home({ navigation, route }) {
         setInterests(interestsList);
 
         fetchHomeOffers(interestsList);
-        
+
       } else {
         console.log('No such document!');
         setInterests([]);
@@ -117,16 +158,35 @@ export default function Home({ navigation, route }) {
     }
   };
 
-  const toggleSelection = (id) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(item => item !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
-    if (savedItems.includes(id)) {
-      setSavedItems(savedItems.filter(item => item !== id));
-    } else {
-      setSavedItems([...savedItems, id]);
+  const toggleSelection = async (id) => {
+    try {
+      const userRef = collection(db, 'users');
+      const userQuerySnapshot = await getDocs(query(userRef, where('email', '==', user.email)));
+
+      if (!userQuerySnapshot.empty) {
+        // Assuming there's only one document for each user email
+        const userDocRef = userQuerySnapshot.docs[0].ref;
+        const userDocSnapshot = await getDoc(userDocRef);
+        const userData = userDocSnapshot.data();
+
+        if (userData) {
+          const savedOffers = userData.savedOffers || [];
+          const updatedSavedOffers = savedOffers.includes(id) ? savedOffers.filter(item => item !== id) : [...savedOffers, id];
+
+          await updateDoc(userDocRef, {
+            savedOffers: updatedSavedOffers,
+          });
+
+          setUserSavedOffers(updatedSavedOffers);
+          loadSavedOffers();
+        } else {
+          console.log('No user data found');
+        }
+      } else {
+        console.log('No user found with email:', user.email);
+      }
+    } catch (error) {
+      console.error("Error updating saved items:", error);
     }
   };
 
@@ -141,26 +201,54 @@ export default function Home({ navigation, route }) {
   };
 
   const handleSaveOffer = (offer) => {
-    toggleSelection(offer.id);
-    console.log('Saving offer:', offer);
+    if (!isUserLoggedIn) {
+      Alert.alert(
+        'Error',
+        'Please login to save this offer.',
+        [
+          {
+            text: 'Login',
+            onPress: () => navigation1.navigate('Login'),
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      );
+
+    } else {
+      toggleSelection(offer.id);
+    }
   };
 
+  const filterPageNavigate = () => {
+    navigation1.navigate('FilterOffersPage');
+  }
+
+  const navigateToFilterPage = () => {
+    navigation1.navigate('FilterOptionsPage');
+  }
+
   const renderItem = ({ item }) => {
+    const index = data.indexOf(item);
+    const key = item.id + '-' + index;
     // Convert Posted_Date string to Date object
     const postedDate = new Date(item.general_info.Posted_Date);
-  
+
     // Get the current date and time
     const currentDate = new Date();
-  
+
     // Calculate the time difference in milliseconds
     const timeDifference = currentDate - postedDate;
-  
+
     // Convert milliseconds to seconds, minutes, hours, and days
     const secondsDifference = Math.floor(timeDifference / 1000);
     const minutesDifference = Math.floor(secondsDifference / 60);
     const hoursDifference = Math.floor(minutesDifference / 60);
     const daysDifference = Math.floor(hoursDifference / 24);
-  
+
     // Determine the appropriate time unit to display
     let timeAgo;
     if (daysDifference > 0) {
@@ -172,12 +260,12 @@ export default function Home({ navigation, route }) {
     } else {
       timeAgo = `${secondsDifference} second${secondsDifference > 1 ? 's' : ''} ago`;
     }
-  
+
     return (
       <View style={styles.offerContainer}>
         <TouchableOpacity style={styles.saveButton} onPress={() => handleSaveOffer(item)}>
-          <FontAwesome name="bookmark" size={24} 
-            color={selectedItems.includes(item.id) ? 'black' : 'lightgray'}
+          <FontAwesome name="bookmark" size={24}
+            color={userSavedOffers.includes(item.id) ? 'black' : 'lightgray'}
           ></FontAwesome>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleOfferPress(item)}>
@@ -206,23 +294,23 @@ export default function Home({ navigation, route }) {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <TextInput
+        <TextInput onPressIn={filterPageNavigate}
           style={styles.searchInput}
           placeholder="Search"
           placeholderTextColor="lightgray"
         />
-        <TouchableOpacity style={styles.filterButton}>
-          <Image source={require('../assets/filtericon.png')} style={styles.filterIcon} />
-        </TouchableOpacity>
+        {/* <TouchableOpacity onPress={navigateToFilterPage} style={styles.filterButton}>
+          <Image source={require('../assets/filtericon.png')} tintColor={'white'} style={styles.filterIcon} />
+        </TouchableOpacity> */}
       </View>
       <Text style={styles.recentOffersText}>Recent Offers</Text>
-      {loading ? 
+      {loading ?
         <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
-        : 
+        :
         <FlatList
           data={data}
           renderItem={renderItem}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => item.id + '-' + index}
           contentContainerStyle={{ paddingBottom: 60 }}
         />
       }
@@ -245,20 +333,10 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   searchInput: {
-    flex: 1,
-    height: 40,
-    paddingHorizontal: 15,
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
     borderRadius: 10,
-    backgroundColor: 'white',
-    color: 'black',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-    elevation: 1,
   },
   filterButton: {
     padding: 8,
