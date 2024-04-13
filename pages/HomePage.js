@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
@@ -7,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../config/firebase'; // Import Firebase auth
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
 import { db } from '../config/firebase';
+
 
 
 export default function Home({ navigation, route }) {
@@ -23,6 +25,63 @@ export default function Home({ navigation, route }) {
   const [user, setUser] = useState(null);
 
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+
+  const getRandomImage = async (offerId) => {
+    let usedImages = await AsyncStorage.getItem('usedImages');
+    usedImages = usedImages ? JSON.parse(usedImages) : {};
+  
+    // If there's already an image for this offer, return it
+    if (usedImages[offerId]) {
+      return usedImages[offerId];
+    }
+  
+    // Array to store available image indices
+    const availableImages = Array.from({ length: 19 }, (_, i) => i + 1).filter(
+      (x) => !Object.values(usedImages).includes(x)
+    );
+  
+    // Function to generate a random number from available images
+    const generateRandomNumber = () => {
+      const randomIndex = Math.floor(Math.random() * availableImages.length);
+      return availableImages[randomIndex];
+    };
+  
+    let randomNumber = generateRandomNumber();
+  
+    // Select the image based on the random number
+    const imageMap = {
+      1: require('../assets/companies/c1.png'),
+      2: require('../assets/companies/c2.png'),
+      3: require('../assets/companies/c3.png'),
+      4: require('../assets/companies/c4.png'),
+      5: require('../assets/companies/c5.png'),
+      6: require('../assets/companies/c6.png'),
+      7: require('../assets/companies/c7.png'),
+      8: require('../assets/companies/c8.png'),
+      9: require('../assets/companies/c9.png'),
+      10: require('../assets/companies/c10.png'),
+      11: require('../assets/companies/c11.png'),
+      12: require('../assets/companies/c12.png'),
+      13: require('../assets/companies/c13.png'),
+      14: require('../assets/companies/c14.png'),
+      15: require('../assets/companies/c15.png'),
+      16: require('../assets/companies/c16.png'),
+      17: require('../assets/companies/c17.png'),
+      18: require('../assets/companies/c18.png'),
+      19: require('../assets/companies/c19.png'),
+    };
+
+    const selectedImage = imageMap[randomNumber];
+  usedImages[offerId] = selectedImage;
+  await AsyncStorage.setItem('usedImages', JSON.stringify(usedImages));
+
+  return selectedImage;
+};
+
+
+
+
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -76,6 +135,8 @@ export default function Home({ navigation, route }) {
     fetchData();
   }, []);
 
+
+
   const loadSavedOffers = async () => {
     if (isUserLoggedIn) {
       const userRef = collection(db, 'users');
@@ -88,7 +149,7 @@ export default function Home({ navigation, route }) {
           const userData = userQuerySnapshot.docs[0].data();
 
           // Use userData as needed
-          console.log('User offers:', userData.savedOffers.flat());
+          // console.log('User offers:', userData.savedOffers.flat());
           setUserSavedOffers(userData.savedOffers.flat());
         } else {
           console.log('No user found with email:', user.email);
@@ -102,36 +163,31 @@ export default function Home({ navigation, route }) {
   const fetchHomeOffers = async (interests) => {
     try {
       const offers = [];
-
-      // Construct a Firestore query for each interest and parameter
+      // Assuming you retrieve offers correctly above this
       for (const interest of interests) {
         if (interest) {
           const dataOffers = await getDocs(collection(db, 'offers'));
-
-          dataOffers.forEach((doc) => {
+          for (const doc of dataOffers.docs) {
             const { title, additional_info, description } = doc.data();
-
+            const imageUri = await getRandomImage(doc.id); // Correctly awaited within an async loop
+  
             if (title.includes(interest) ||
               (additional_info?.Fonction?.includes(interest) || additional_info?.Domaine?.includes(interest)) ||
               description.includes(interest)) {
-              offers.push({ id: doc.id, ...doc.data() });
+                offers.push({ id: doc.id, imageUri, ...doc.data() });
             }
-          });
+          }
         }
       }
-
-      // Sort offers by Posted_Date from newest to oldest
       offers.sort((a, b) => new Date(b.general_info.Posted_Date) - new Date(a.general_info.Posted_Date));
-
-      // Set data and loading state after all offers have been fetched and sorted
       setData(offers);
       setLoading(false);
-
     } catch (error) {
       console.error('Error fetching home offers:', error);
-      // Handle error as needed
     }
   };
+  
+  
 
   const fetchUserData = async (email) => {
     try {
@@ -232,6 +288,8 @@ export default function Home({ navigation, route }) {
   }
 
   const renderItem = ({ item }) => {
+
+
     const index = data.indexOf(item);
     const key = item.id + '-' + index;
     // Convert Posted_Date string to Date object
@@ -264,8 +322,8 @@ export default function Home({ navigation, route }) {
     return (
       <View style={styles.offerContainer}>
         <TouchableOpacity style={styles.saveButton} onPress={() => handleSaveOffer(item)}>
-          <FontAwesome name="bookmark" size={24}
-            color={userSavedOffers.includes(item.id) ? 'black' : 'lightgray'}
+          <FontAwesome name="bookmark" size={22}
+            color={userSavedOffers.includes(item.id) ? '#0047D2' : 'lightgray'}
           ></FontAwesome>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleOfferPress(item)}>
@@ -279,7 +337,8 @@ export default function Home({ navigation, route }) {
               </View>
             </View>
             <View style={styles.companyContainer}>
-              <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
+            <Image source={item.imageUri} style={styles.logoImage} />
+
               <View style={styles.companyDetails}>
                 <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{item.general_info.City}</Text>
@@ -368,8 +427,8 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     position: 'absolute',
-    top: 15,
-    right: 15,
+    top: 8,
+    right: 5,
     padding: 8,
     borderRadius: 50,
   },
@@ -381,7 +440,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   titleText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 5,
   },
@@ -402,9 +461,8 @@ const styles = StyleSheet.create({
     color: '#4A4A4A',
   },
   logoImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
     marginBottom: 5,
   },
   companyContainer: {
