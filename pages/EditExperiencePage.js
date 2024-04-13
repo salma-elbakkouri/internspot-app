@@ -5,12 +5,15 @@ import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
 import { db } from '../config/firebase';
 
-export default function AddEducationPage({ route }) {
-    const userID = route.params?.userID;
-    const profileRedirect = route.params?.profileRedirect;
-    const [school, setSchool] = useState('');
-    const [degree, setDegree] = useState('');
+
+export default function EditExperiencePage({route}) {
+    const userID = route.params.userID;
+    const experience = route.params.experience;
+    const index = route.params.index;
+    const [company, setCompany] = useState('');
+    const [postTitle, setPostTitle] = useState('');
     const [specialization, setSpecialization] = useState('');
+    const [location, setLocation] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [description, setDescription] = useState('');
@@ -46,36 +49,40 @@ export default function AddEducationPage({ route }) {
     const navigation = useNavigation();
 
     const handleCancel = () => {
-        if (profileRedirect) {
-            navigation.navigate('EditProfilePage', { reload: true });
-        }else{
-            navigation.navigate('EducationPage', { userID, addedNewEducation: true});
-        }
+        navigation.goBack();
     };
 
+    useEffect(() => {
+        setCompany(experience.company);
+        setPostTitle(experience.post_title);
+        setSpecialization(experience.specialization);
+        setLocation(experience.location);
+        // setStartDate(experience.start_date);
+        // setEndDate(experience.end_date);
+        setDescription(experience.description);
+    }, []);
+
     const handleSubmit = async () => {
-        const newEducation = {
-            school,
-            degree,
+        const newExperience = {
+            company,
+            post_title: postTitle,
             specialization,
+            location,
             start_date: startDate,
             end_date: endDate,
             description,
         };
-    
         const userDocRef = doc(db, 'users', userID);
     
         try {
             const userDocSnapshot = await getDoc(userDocRef);
             
-            // Check if user document exists
             if (userDocSnapshot.exists()) {
                 const userData = userDocSnapshot.data();
-                const educations = userData.educations || []; // Initialize educations array if it doesn't exist
-                educations.push(newEducation);
-    
+                const experiences = userData.experiences || [];
+                experiences.push(newExperience);
                 await updateDoc(userDocRef, {
-                    educations: educations,
+                    experiences: experiences,
                 });
             } else {
                 console.error("User document does not exist!");
@@ -84,46 +91,42 @@ export default function AddEducationPage({ route }) {
             console.error("Error fetching user document:", error);
         }
 
-        setSchool('');
-        setDegree('');
-        setSpecialization('');
-        setSchool('');
-        setDegree('');
-        setSpecialization('');
-    
-        if (profileRedirect) {
-            navigation.navigate('EditProfilePage', { reload: true });
-        }else{
-            navigation.navigate('EducationPage', { userID, addedNewEducation: true});
-        }
+        navigation.goBack();
     };
-     
 
     return (
         <View style={styles.container}>
             <View style={styles.form}>
-                <Text style={styles.label}>School</Text>
+                <Text style={styles.label}>Company</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="EX : MOHAMMED V UNIVERSITY"
-                    value={school}
-                    onChangeText={setSchool}
+                    placeholder="Ex: Google"
+                    value={company}
+                    onChangeText={setCompany}
                 />
 
-                <Text style={styles.label}>Degree</Text>
+                <Text style={styles.label}>Post Title</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="EX : Master Degree"
-                    value={degree}
-                    onChangeText={setDegree}
+                    placeholder="Ex: Full Stack Developer"
+                    value={postTitle}
+                    onChangeText={setPostTitle}
                 />
 
                 <Text style={styles.label}>Specialization</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="EX : Software Engineering"
+                    placeholder="Ex: Web development"
                     value={specialization}
                     onChangeText={setSpecialization}
+                />
+
+                <Text style={styles.label}>Location</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Ex: Rabat - Salé"
+                    value={location}
+                    onChangeText={setLocation}
                 />
 
                 <View style={styles.datePickerContainer}>

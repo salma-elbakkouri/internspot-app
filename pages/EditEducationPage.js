@@ -5,9 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
 import { db } from '../config/firebase';
 
-export default function AddEducationPage({ route }) {
+export default function EditEducationPage({ route }) {
     const userID = route.params?.userID;
-    const profileRedirect = route.params?.profileRedirect;
+    const education = route.params?.education;
+    const index = route.params?.index;
     const [school, setSchool] = useState('');
     const [degree, setDegree] = useState('');
     const [specialization, setSpecialization] = useState('');
@@ -83,19 +84,8 @@ export default function AddEducationPage({ route }) {
         } catch (error) {
             console.error("Error fetching user document:", error);
         }
-
-        setSchool('');
-        setDegree('');
-        setSpecialization('');
-        setSchool('');
-        setDegree('');
-        setSpecialization('');
     
-        if (profileRedirect) {
-            navigation.navigate('EditProfilePage', { reload: true });
-        }else{
-            navigation.navigate('EducationPage', { userID, addedNewEducation: true});
-        }
+        navigation.goBack();
     };
      
 

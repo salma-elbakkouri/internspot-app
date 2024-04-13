@@ -151,7 +151,7 @@ export default function SavedPage({ navigation, route }) {
               </View>
             </View>
             <View style={styles.companyContainer}>
-              <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
+              <Image source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }} style={styles.logoImage} />
               <View style={styles.companyDetails}>
                 <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{item.general_info.City}</Text>

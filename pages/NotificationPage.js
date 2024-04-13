@@ -11,9 +11,9 @@ export default function NotificationPage({ navigation }) {
 
 
   const applicationNotifications = [
-    { id: '1', image: require('../assets/amazon.jpg'), title: 'Application Sent!', content: 'Your application sent successfully to Capgemini, they will respond soon.', time: '5 minutes ago' },
-    { id: '2', image: require('../assets/amazon.jpg'), title: 'Application Accepted!', content: 'Your application Junior UX design at Amazon accepted! Contact the company right now.', time: '2 hours ago' },
-    { id: '3', image: require('../assets/amazon.jpg'), title: 'Application Rejected!', content: 'Your application to Java Developer at CGI rejected! Discover more offers match your skills.', time: '1 day ago' },
+    // { id: '1', image: require('../assets/amazon.jpg'), title: 'Application Sent!', content: 'Your application sent successfully to Capgemini, they will respond soon.', time: '5 minutes ago' },
+    // { id: '2', image: require('../assets/amazon.jpg'), title: 'Application Accepted!', content: 'Your application Junior UX design at Amazon accepted! Contact the company right now.', time: '2 hours ago' },
+    // { id: '3', image: require('../assets/amazon.jpg'), title: 'Application Rejected!', content: 'Your application to Java Developer at CGI rejected! Discover more offers match your skills.', time: '1 day ago' },
   ];
 
 

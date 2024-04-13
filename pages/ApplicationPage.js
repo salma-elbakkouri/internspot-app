@@ -1,18 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
 import BottomTabBar from '../components/BottomTabBar';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ApplicationPage({ navigation }) {
+  const navigation1 = useNavigation();
   const applications = [
     { id: '1', status: 'Application Sent', title: 'Junior UX Designer', company: 'Amazon' },
     { id: '2', status: 'Application Accepted', title: 'Software Engineer', company: 'Google' },
     { id: '3', status: 'Application Rejected', title: 'Marketing Specialist', company: 'Oracle' },
   ];
+  const filterPageNavigate = () => {
+    navigation1.navigate('FilterOffersPage');
+  }
+
+
 
   const appliedOffers = ({ item }) => (
     <View style={styles.applicationContainer}>
       {/* Amazon Icon */}
-      <Image source={require('../assets/amazon.jpg')} style={styles.companyIcon} />
+      <Image source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }} style={styles.companyIcon} />
       {/* Application details */}
       <TouchableOpacity>
         <View style={styles.applicationDetails}>
@@ -33,14 +40,14 @@ export default function ApplicationPage({ navigation }) {
     <View style={styles.container}>
       {/* Search input and filter button */}
       <View style={styles.searchContainer}>
-        <TextInput
+        <TextInput onPressIn={filterPageNavigate}
           style={styles.searchInput}
           placeholder="Search"
           placeholderTextColor="lightgray"
         />
-        <TouchableOpacity style={styles.filterButton}>
-          <Image source={require('../assets/filtericon.png')} style={styles.filterIcon} />
-        </TouchableOpacity>
+        {/* <TouchableOpacity onPress={navigateToFilterPage} style={styles.filterButton}>
+          <Image source={require('../assets/filtericon.png')} tintColor={'white'} style={styles.filterIcon} />
+        </TouchableOpacity> */}
       </View>
       <Text style={styles.MyapplicationsText}>My Applications</Text>
       {/* Flatlist for applications */}
@@ -115,20 +122,10 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   searchInput: {
-    flex: 1,
-    height: 40,
-    paddingHorizontal: 15,
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
     borderRadius: 10,
-    backgroundColor: 'white',
-    color: 'black',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-    elevation: 1,
   },
   filterButton: {
     padding: 8,

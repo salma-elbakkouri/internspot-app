@@ -5,7 +5,7 @@ import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../config/firebase'; // Import Firebase auth
-import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
+import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite';
 import { db } from '../config/firebase';
 
 
@@ -279,7 +279,7 @@ export default function Home({ navigation, route }) {
               </View>
             </View>
             <View style={styles.companyContainer}>
-              <Image source={require('../assets/amazon.jpg')} style={styles.logoImage} />
+              <Image source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }} style={styles.logoImage} />
               <View style={styles.companyDetails}>
                 <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{item.general_info.City}</Text>

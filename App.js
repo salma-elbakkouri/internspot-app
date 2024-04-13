@@ -28,6 +28,9 @@ import ApplyWebView from './pages/ApplyWebView';
 import { auth } from './config/firebase';
 import FilterOptionsPage from './pages/FilterOptionsPage'; 
 import FilterOffersResults from './pages/FilterOffersResults';
+import EditProfilePage from './pages/EditProfilePage';
+import EditEducationPage from './pages/EditEducationPage';
+import EditExperiencePage from './pages/EditExperiencePage';
 
 const Stack = createStackNavigator();
 
@@ -61,6 +64,9 @@ export default function App() {
         <Stack.Screen name="FilterOffersPage" component={FilterOffersPage} />
         <Stack.Screen name="FilterOptionsPage" component={FilterOptionsPage} />
         <Stack.Screen name="FilterOffersResults" component={FilterOffersResults} />
+        <Stack.Screen name="EditProfilePage" component={EditProfilePage} />
+        <Stack.Screen name="EditEducationPage" component={EditEducationPage} />
+        <Stack.Screen name="EditExperiencePage" component={EditExperiencePage} />
         
       </Stack.Navigator>
     </NavigationContainer>

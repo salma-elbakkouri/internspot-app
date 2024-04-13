@@ -8,6 +8,7 @@ import { db } from '../config/firebase';
 
 export default function AddExperiencePage({route}) {
     const userID = route.params?.userID;
+    const profileRedirect = route.params?.profileRedirect;
     const [company, setCompany] = useState('');
     const [postTitle, setPostTitle] = useState('');
     const [specialization, setSpecialization] = useState('');
@@ -65,12 +66,10 @@ export default function AddExperiencePage({route}) {
         try {
             const userDocSnapshot = await getDoc(userDocRef);
             
-            // Check if user document exists
             if (userDocSnapshot.exists()) {
                 const userData = userDocSnapshot.data();
-                const experiences = userData.experiences || []; // Initialize experiences array if it doesn't exist
+                const experiences = userData.experiences || [];
                 experiences.push(newExperience);
-    
                 await updateDoc(userDocRef, {
                     experiences: experiences,
                 });
@@ -80,7 +79,12 @@ export default function AddExperiencePage({route}) {
         } catch (error) {
             console.error("Error fetching user document:", error);
         }
-        navigation.navigate('ExperiencePage', { userID, addedNewExperience: true });
+
+        if (profileRedirect) {
+            navigation.navigate('EditProfilePage');
+        }else {
+            navigation.navigate('ExperiencePage', { userID, addedNewExperience: true });
+        }
     };
 
     return (

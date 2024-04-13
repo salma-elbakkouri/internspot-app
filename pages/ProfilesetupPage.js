@@ -195,9 +195,9 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 40,
         marginBottom: 15,
-        borderWidth: 1, // for example
-        borderColor: '#ccc', // for example
-        paddingHorizontal: 10, // for example
-        backgroundColor: '#fff', // for example
+        borderWidth: 1,
+        borderColor: '#ccc',
+        paddingHorizontal: 10,
+        backgroundColor: '#fff',
     }
 });

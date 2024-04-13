@@ -12,6 +12,9 @@ export default function SkillsPage({ route }) {
     const [skills, setSkills] = useState([]);
     const [defaultSkills, setDefaultSkills] = useState([]);
 
+    const profileRedirect = route.params?.profileRedirect;
+    const userSkills = route.params?.userSkills;
+
     const fetchSkills = async () => {
         try {
             const querySnapshot = await getDocs(collection(db, 'skills'));
@@ -26,6 +29,13 @@ export default function SkillsPage({ route }) {
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        if (profileRedirect) {
+            setSelectedSkills(userSkills);
+
+        }
+    }, []);
 
     useEffect(() => {
         fetchSkills();
@@ -48,8 +58,9 @@ export default function SkillsPage({ route }) {
 
         try {
             const userDocSnapshot = await getDoc(userDocRef);
-            defaultSkills.forEach(async (skill) => {
-                if (!skills.includes(skill)) {
+            selectedSkills.forEach(async (skill) => {
+                if (!defaultSkills.includes(skill)) {
+                    console.log("Storing new skill:", skill);
                     await storeNewSkill(skill);
                 }
             });
@@ -65,7 +76,11 @@ export default function SkillsPage({ route }) {
             console.error("Error fetching user document:", error);
         }
 
-        navigation.navigate('ProfilecreatedPage', { userID });
+        if (profileRedirect) {
+            navigation.goBack();
+        }else{
+            navigation.navigate('ProfilecreatedPage', { userID });
+        }
     };
 
     const storeNewSkill = async (skill) => {
@@ -131,7 +146,7 @@ export default function SkillsPage({ route }) {
                 <TouchableOpacity style={[styles.navigationButton, { backgroundColor: '#0047D2' }]} onPress={navigateToProfilecreatedPage}>
                     <Text style={styles.navigationButtonText}>Finish</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.navigationButton, { backgroundColor: '#E8F0FF' }]} onPress={navigateToExperiencePage}>
+                <TouchableOpacity style={[styles.navigationButton, { backgroundColor: '#E8F0FF' }]} onPress={profileRedirect ? () => {navigation.goBack();} : navigateToExperiencePage}>
                     <Text style={[styles.navigationButtonText, { color: '#0047D2' }]}>Back</Text>
                 </TouchableOpacity>
             </View>
@@ -173,6 +188,7 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         margin: 5,
         borderRadius: 20,
+        backgroundColor: 'red'
     },
     skillButtonText: {
         fontSize: 14,
