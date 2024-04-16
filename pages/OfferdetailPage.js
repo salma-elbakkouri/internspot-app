@@ -4,6 +4,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../config/firebase';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite';
 import { db } from '../config/firebase';
+import { useFocusEffect } from '@react-navigation/native';
 
 const OfferdetailsPage = ({ route, navigation }) => {
     const { offer, comeFromLoginPage } = route.params;
@@ -11,6 +12,36 @@ const OfferdetailsPage = ({ route, navigation }) => {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [applied, setApplied] = React.useState(false);
     const [user, setUser] = useState(null);
+    
+
+    useFocusEffect(
+        React.useCallback(() => {
+            if (applied) {
+                showApplicationStatusAlert();
+            }
+        }, [applied])
+    );
+
+    const showApplicationStatusAlert = () => {
+        Alert.alert(
+            "Did you Apply to this Offer?",
+            "Please confirm if you have applied to this offer.",
+            [
+                {
+                    text: "Yes",
+                    onPress: handelOfferApplied,
+                },
+                {
+                    text: "No",
+                    onPress: () => setApplied(false),
+                    style: "cancel"
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
+
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -96,17 +127,17 @@ const OfferdetailsPage = ({ route, navigation }) => {
             const userData = querySnapshot.docs[0].data();
             const appliedOffers = userData.appliedOffers || [];
             const docRef = querySnapshot.docs[0].ref;
-    
+
             // Check if the offer ID already exists in the appliedOffers array
             if (!appliedOffers.includes(offer.id)) {
                 // If the offer ID is not already in the array, push it
                 appliedOffers.push(offer.id);
-    
+
                 // Update the document with the updated appliedOffers array
                 await updateDoc(docRef, {
                     appliedOffers: appliedOffers,
                 });
-    
+
                 setApplied(false);
             } else {
                 // If the offer ID already exists, you can handle it here (maybe show a message or perform some other action)
@@ -117,7 +148,7 @@ const OfferdetailsPage = ({ route, navigation }) => {
             console.error('Error applying offer: ', error);
             setApplied(false);
         }
-    };    
+    };
 
     const postedDate = new Date(offer.general_info.Posted_Date);
     const currentDate = new Date();
@@ -149,13 +180,13 @@ const OfferdetailsPage = ({ route, navigation }) => {
 
             {/* Save button */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSaveOffer}>
-                <FontAwesome name="bookmark" size={24} color="#0047D2" />
+                <FontAwesome name="bookmark" size={24} color="lightgray" />
             </TouchableOpacity>
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {/* Offer picture */}
                 <Image
-                    source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }}
+                    source={require('../assets/companies/c5.png')}
                     style={styles.offerPicture}
                     resizeMode="contain"
                 />
@@ -165,19 +196,7 @@ const OfferdetailsPage = ({ route, navigation }) => {
                 <Text style={styles.location}>{offer.general_info.City}</Text>
                 <Text style={styles.offerTitle}>{offer.title}</Text>
 
-                {applied ?
-                    <View style={styles.appliedBlock}>
-                        <Text style={styles.appliedBlockTitle}>This you Apply to this Offer ?</Text>
-                        <View style={styles.appliedBlockButtons}>
-                            <TouchableOpacity style={styles.appliedBlockBtn} onPress={handelOfferApplied}>
-                                <Text style={styles.appliedBlockBtnText}>Yes</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.appliedBlockBtn} onPress={() => { setApplied(false) }}>
-                                <Text style={styles.appliedBlockBtnText}>No</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    : null}
+                
 
                 {/* More details */}
                 <View style={styles.moreDetails}>
@@ -243,17 +262,18 @@ const styles = StyleSheet.create({
     },
     companyName: {
         textAlign: 'center',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         marginTop: 20,
     },
     location: {
+        fontSize:14,
         textAlign: 'center',
         color: '#666',
     },
     offerTitle: {
         textAlign: 'center',
-        fontSize: 25,
+        fontSize: 20,
         marginTop: 10,
         fontWeight: 'bold',
     },
@@ -288,7 +308,7 @@ const styles = StyleSheet.create({
     },
     applyButton: {
         backgroundColor: '#0047D2',
-        borderRadius: 20,
+        borderRadius: 30,
         paddingVertical: 15,
         position: 'absolute',
         bottom: 10,

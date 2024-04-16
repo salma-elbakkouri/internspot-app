@@ -136,8 +136,8 @@ export default function SavedPage({ navigation, route }) {
     return (
       <View style={styles.offerContainer}>
         <TouchableOpacity style={styles.saveButton} onPress={() => toggleSelection(item.id)}>
-          <FontAwesome name="bookmark" size={24}
-            color={'black'}
+          <FontAwesome name="bookmark" size={22}
+            color={'#0047D2'}
           ></FontAwesome>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleOfferPress(item)}>
@@ -151,7 +151,7 @@ export default function SavedPage({ navigation, route }) {
               </View>
             </View>
             <View style={styles.companyContainer}>
-              <Image source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }} style={styles.logoImage} />
+              <Image source={require('../assets/companies/c5.png')} style={styles.logoImage} />
               <View style={styles.companyDetails}>
                 <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{item.general_info.City}</Text>
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   titleText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 5,
   },
@@ -280,9 +280,8 @@ const styles = StyleSheet.create({
     color: '#4A4A4A',
   },
   logoImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
     marginBottom: 5,
   },
   companyContainer: {
@@ -300,8 +299,8 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     position: 'absolute',
-    top: 15,
-    right: 15,
+    top: 8,
+    right: 8,
     padding: 8,
     borderRadius: 50,
   },

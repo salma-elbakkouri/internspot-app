@@ -1,120 +1,99 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { auth } from '../config/firebase'; // Ensure all these imports are correct
 
 export default function ApplicationPage({ navigation }) {
   const navigation1 = useNavigation();
-  const applications = [
-    { id: '1', status: 'Application Sent', title: 'Junior UX Designer', company: 'Amazon' },
-    { id: '2', status: 'Application Accepted', title: 'Software Engineer', company: 'Google' },
-    { id: '3', status: 'Application Rejected', title: 'Marketing Specialist', company: 'Oracle' },
-  ];
-  const filterPageNavigate = () => {
-    navigation1.navigate('FilterOffersPage');
-  }
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setUser(user);
+        fetchAppliedOffers(user);
+      } else {
+        setUser(null);
+        setLoading(false); // Ensure we stop loading if no user is logged in
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
+  const fetchAppliedOffers = async (user) => {
+    const db = getFirestore();
+    try {
+      const userRef = query(collection(db, 'users'), where('email', '==', user.email));
+      const snapshot = await getDocs(userRef);
+      if (!snapshot.empty) {
+        const userData = snapshot.docs[0].data();
+        const appliedOffersIds = userData.appliedOffers || [];
+        const offers = await Promise.all(appliedOffersIds.map(async (id) => {
+          const offerRef = doc(db, 'offers', id);
+          const offerSnap = await getDoc(offerRef);
+          return offerSnap.exists() ? { id: offerSnap.id, ...offerSnap.data() } : null;
+        }));
+        setApplications(offers.filter(Boolean)); // Filter out any null values
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching applied offers: ', error);
+      setLoading(false); // Ensure loading is set to false even on error
+    }
+  };
 
-  const appliedOffers = ({ item }) => (
+  const renderItem = ({ item }) => (
     <View style={styles.applicationContainer}>
-      {/* Amazon Icon */}
-      <Image source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }} style={styles.companyIcon} />
-      {/* Application details */}
-      <TouchableOpacity>
+      <Image source={require('../assets/companies/c5.png')} style={styles.companyIcon} />
+      <TouchableOpacity onPress={() => navigation1.navigate('OfferDetail', { offerId: item.id })}>
         <View style={styles.applicationDetails}>
           <Text style={styles.applicationTitle}>{item.title}</Text>
-          <Text style={styles.companyName}>{item.company}</Text>
-          {/* Application status */}
-          {/* <View style={[styles.applicationStatus, getStatusStyle(item.status)]}>
-          <Text style={[styles.statusText, getStatustextStyle(item.status)]}>{item.status}</Text>
-        </View> */}
+          {/* Change this line to use item.additional_info.Entreprise */}
+          <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
         </View>
-        {/* Arrow Icon */}
-        {/* <Image source={require('../assets/arrow.png')} style={styles.arrowIcon} /> */}
       </TouchableOpacity>
     </View>
   );
 
+
   return (
     <View style={styles.container}>
-      {/* Search input and filter button */}
-      <View style={styles.searchContainer}>
-        <TextInput onPressIn={filterPageNavigate}
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="lightgray"
-        />
-        {/* <TouchableOpacity onPress={navigateToFilterPage} style={styles.filterButton}>
-          <Image source={require('../assets/filtericon.png')} tintColor={'white'} style={styles.filterIcon} />
-        </TouchableOpacity> */}
-      </View>
       <Text style={styles.MyapplicationsText}>My Applications</Text>
-      {/* Flatlist for applications */}
-      <FlatList
-        data={applications}
-        renderItem={appliedOffers}
-        keyExtractor={item => item.id}
-        contentContainerStyle={{ paddingBottom: 60 }}
-      />
-      {/* Bottom tab bar with navigation prop */}
-      <BottomTabBar navigation={navigation} state={{ routeNames: ['Home', 'Saved', 'Application', 'Notification', 'Profile'], index: 2 }} />
+      {loading ? (
+        <View style={styles.centeredLoader}>
+          <ActivityIndicator size="large" color="#0047D2" />
+        </View>
+      ) : (
+        <FlatList
+          data={applications}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 60 }}
+        />
+      )}
+      <BottomTabBar navigation={navigation} />
     </View>
   );
+
 }
 
-// Function to get style based on application status
-const getStatustextStyle = (status) => {
-  switch (status) {
-    case 'Application Sent':
-      return {
-        color: '#0047D2', // Text color for Application Sent
-      };
-    case 'Application Accepted':
-      return {
-        color: '#0D8728', // Text color for Application Accepted
-      };
-    case 'Application Rejected':
-      return {
-        color: '#FF4242', // Text color for Application Rejected
-      };
-    default:
-      return {};
-  }
-}
+// Add your styles here if necessary
 
-
-// Function to get style based on application status
-const getStatusStyle = (status) => {
-  switch (status) {
-    case 'Application Sent':
-      return {
-        backgroundColor: '#e8f0ff',
-        padding: 2,
-        width: 130,
-      };
-    case 'Application Accepted':
-      return {
-        backgroundColor: '#d2ffdc',
-        padding: 2,
-        width: 130,
-      };
-    case 'Application Rejected':
-      return {
-        backgroundColor: '#ffd9d9',
-        padding: 2,
-        width: 130,
-      };
-    default:
-      return {};
-  }
-}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     padding: 10,
+  },
+  centeredLoader: {
+    flex: 1, // Takes full height of the container
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center' // Center horizontally
   },
   searchContainer: {
     flexDirection: 'row',
@@ -140,7 +119,7 @@ const styles = StyleSheet.create({
   MyapplicationsText: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 30,
+    marginTop: 70,
     marginBottom: 12,
     marginLeft: 10,
     color: 'black',
@@ -158,15 +137,15 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    marginRight: 10,
   },
   applicationDetails: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   applicationTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 5,
   },
   companyName: {
     color: '#4A4A4A',
