@@ -31,6 +31,7 @@ import FilterOffersResults from './pages/FilterOffersResults';
 import EditProfilePage from './pages/EditProfilePage';
 import EditEducationPage from './pages/EditEducationPage';
 import EditExperiencePage from './pages/EditExperiencePage';
+import ApplicationOfferDetail from './pages/ApplicationOfferDetail';
 
 const Stack = createStackNavigator();
 
@@ -67,6 +68,7 @@ export default function App() {
         <Stack.Screen name="EditProfilePage" component={EditProfilePage} />
         <Stack.Screen name="EditEducationPage" component={EditEducationPage} />
         <Stack.Screen name="EditExperiencePage" component={EditExperiencePage} />
+        <Stack.Screen name="ApplicationOfferDetail" component={ApplicationOfferDetail} />
         
       </Stack.Navigator>
     </NavigationContainer>

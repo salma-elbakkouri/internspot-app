@@ -49,7 +49,7 @@ export default function ApplicationPage({ navigation }) {
   const renderItem = ({ item }) => (
     <View style={styles.applicationContainer}>
       <Image source={require('../assets/companies/c5.png')} style={styles.companyIcon} />
-      <TouchableOpacity onPress={() => navigation1.navigate('OfferDetail', { offerId: item.id })}>
+      <TouchableOpacity onPress={() => navigation1.navigate('ApplicationOfferDetail', { offer: item })}>
         <View style={styles.applicationDetails}>
           <Text style={styles.applicationTitle}>{item.title}</Text>
           {/* Change this line to use item.additional_info.Entreprise */}
