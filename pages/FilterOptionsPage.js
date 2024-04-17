@@ -18,7 +18,7 @@ export default function FilterOptionsPage({route}) {
     };
 
     // workplace functions
-    const [workplaceOpen, setWorkplaceOpen] = useState(false);
+    const [workplaceOpen, setWorkplaceOpen] = useState(true);
     const [selectedWorkplaceOptions, setSelectedWorkplaceOptions] = useState([]);
 
     const updateWorkplaceOption = (option) => {
@@ -33,7 +33,7 @@ export default function FilterOptionsPage({route}) {
     };
 
     // internship type functions
-    const [internshipTypeOpen, setInternshipTypeOpen] = useState(false);
+    const [internshipTypeOpen, setInternshipTypeOpen] = useState(true);
     const [selectedInternshipType, setSelectedInternshipType] = useState([]);
 
     const updateInternshipType = (type) => {
@@ -49,7 +49,7 @@ export default function FilterOptionsPage({route}) {
 
 
     // cities functions
-    const [cityOpen, setCityOpen] = useState(false);
+    const [cityOpen, setCityOpen] = useState(true);
     const [selectedCities, setSelectedCities] = useState([]);
 
     const updateCityOption = (city) => {
@@ -65,7 +65,7 @@ export default function FilterOptionsPage({route}) {
 
 
     // etude functions 
-    const [etudesOpen, setEtudesOpen] = useState(false);
+    const [etudesOpen, setEtudesOpen] = useState(true);
     const [selectedEtudesOption, setSelectedEtudesOption] = useState('');
 
     const updateEtudesOption = (option) => {
