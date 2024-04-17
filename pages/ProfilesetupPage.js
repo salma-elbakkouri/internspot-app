@@ -7,11 +7,13 @@ import { db } from '../config/firebase';
 
 export default function ProfilesetupPage({ route }) {
     const user = route.params?.user;
+    const completProfile = route.params?.completProfile;
 
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [state, setState] = useState('');
+
+    const [firstName, setFirstName] = useState(completProfile ? user.firstName : '');
+    const [lastName, setLastName] = useState(completProfile ? user.lastName : '');
+    const [phoneNumber, setPhoneNumber] = useState(completProfile ? user.phoneNumber : '');
+    const [state, setState] = useState(completProfile ? user.state : '');
     const [dateOfBirth, setDateOfBirth] = useState(new Date());
     
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -126,11 +128,15 @@ export default function ProfilesetupPage({ route }) {
                 <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
 
-            <View style={styles.skipTextContainer}>
-                <TouchableOpacity style={styles.skipTextButton} onPress={navigateToHomePage}>
-                    <Text style={styles.skipText}>Skip to explore offers</Text>
-                </TouchableOpacity>
-            </View>
+        {
+            !completProfile ? (
+                <View style={styles.skipTextContainer}>
+                    <TouchableOpacity style={styles.skipTextButton} onPress={navigateToHomePage}>
+                        <Text style={styles.skipText}>Skip to explore offers</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : null
+        }
         </View>
     );
 }

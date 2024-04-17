@@ -86,7 +86,31 @@ export default function ProfilePage({ navigation }) {
 
   const generateAndPrintCV = async () => {
     try {
-      // Generate HTML content for the CV
+      // Check if user data is available
+      if (!user || !user.firstName || !user.lastName || !user.email || !user.phoneNumber || !user.educations || !user.experiences || !user.skills) {
+        // Show alert to complete profile
+        Alert.alert(
+            'Complete Your Profile',
+            'Please complete your profile before generating your CV.',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Complete Profile',
+                    onPress: () => {
+                        // Redirect to profile setup page
+                        navigation.navigate('ProfilesetupPage', { user: user, completProfile: true });
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
+        return; // Stop execution if user data is incomplete
+    }
+
+    // Generate HTML content for the CV
       const htmlContent = `
       <!DOCTYPE html>
       <html lang="en">
@@ -171,7 +195,7 @@ export default function ProfilePage({ navigation }) {
       
       <div class="container">
           <div class="header">
-              <img src="${user.profileImageUrl}" alt="Profile Picture">
+              <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}" alt="Profile Picture">
               <h1>${user.firstName} ${user.lastName}</h1>
               <p>Student</p>
               <p>Email: ${user.email} | Phone: ${user.phoneNumber}</p>
