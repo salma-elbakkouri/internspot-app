@@ -7,6 +7,12 @@ import { auth } from '../config/firebase'; // Import Firebase auth
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite';
 import { db } from '../config/firebase';
+import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
+import * as IntentLauncher from 'expo-intent-launcher';
+
+
 
 export default function ProfilePage({ navigation }) {
   const navigation1 = useNavigation();
@@ -66,7 +72,54 @@ export default function ProfilePage({ navigation }) {
     );
   };
 
+  const generateAndPrintCV = async () => {
+    try {
+      // Generate HTML content for the CV
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              /* Add your CSS styles here */
+            </style>
+          </head>
+          <body>
+            <h1>CV</h1>
+            <p>Name: ${user.firstName}</p>
+            <p>Email: ${user.email}</p>
+            <!-- Add more HTML content as needed -->
+          </body>
+        </html>
+      `;
 
+      // Generate PDF from HTML
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+
+      // Check if URI is valid
+      if (!uri) {
+        throw new Error('Generated PDF URI is invalid.');
+      }
+
+      // Define the destination file path
+      const destinationUri = `${FileSystem.documentDirectory}cv.pdf`;
+
+      // Move the PDF file to the destination path
+      await FileSystem.moveAsync({
+        from: uri,
+        to: destinationUri,
+      });
+
+      // Show success message
+      Alert.alert('CV Downloaded', 'Your CV has been downloaded successfully.');
+
+      await IntentLauncher.startActivityAsync(IntentLauncher.ACTION_VIEW, {
+        data: destinationUri,
+        flags: ['FLAG_GRANT_READ_URI_PERMISSION'], // Add this line to grant read permission to the URI
+      });
+    } catch (error) {
+      console.error('Error downloading CV:', error);
+      Alert.alert('Error', 'An error occurred while downloading the CV.');
+    }
+  };
 
   const MenuItem = ({ icon, text, onPress }) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress}>
@@ -92,6 +145,11 @@ export default function ProfilePage({ navigation }) {
         </View>
         <Text style={styles.profileEmail}>{user.email}</Text>
         <Text style={styles.profileNumber}>{user.firstName} {user.lastName}</Text>
+
+        <TouchableOpacity style={styles.downloadCvButton} onPress={generateAndPrintCV}>
+          <Text style={styles.editProfileButtonText}>Download Resume</Text>
+          <FontAwesome5 name="file" size={14} color="white" style={{ marginLeft: 5 }} />
+        </TouchableOpacity>
       </>
     );
   };
@@ -99,7 +157,9 @@ export default function ProfilePage({ navigation }) {
   const UserNotLogined = () => {
     return (
       <View style={styles.UserNotLogined}>
-        <TouchableOpacity style={styles.editProfileButton}>
+        <TouchableOpacity style={styles.editProfileButton} onPress={() => {
+          navigation1.navigate('Login');
+        }}>
           <Text style={styles.editProfileButtonText}>Login</Text>
           <FontAwesome5 name="lock" size={14} color="white" style={{ marginLeft: 5 }} />
         </TouchableOpacity>
@@ -154,6 +214,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 20,
     marginTop: 15,
+  },
+  downloadCvButton: {
+    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+    flexDirection: 'row',
+    padding: 10,
+    paddingHorizontal: 25,
+    borderRadius: 5,
+    marginBottom: 10,
   },
   editProfileButtonText: {
     color: 'white',

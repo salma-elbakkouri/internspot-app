@@ -104,7 +104,10 @@ export default function Home({ navigation, route }) {
       const offers = [];
 
       // Construct a Firestore query for each interest and parameter
-      for (const interest of interests) {
+      for (var interest of interests) {
+        if(interest === 'Web Development') {
+          interest = 'Laravel';
+        }
         if (interest) {
           const dataOffers = await getDocs(collection(db, 'offers'));
 
@@ -118,6 +121,13 @@ export default function Home({ navigation, route }) {
             }
           });
         }
+
+      }
+      if (offers.length === 0) {
+        const offerData = await getDocs(collection(db, 'offers'));
+        offerData.forEach((doc) => {
+          offers.push({ id: doc.id, ...doc.data() });
+        });
       }
 
       // Sort offers by Posted_Date from newest to oldest
