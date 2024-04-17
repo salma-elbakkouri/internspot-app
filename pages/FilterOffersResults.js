@@ -35,7 +35,7 @@ export default function FilterOffersResults({ navigation, route }) {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
-        fetchUserData(user.email);
+        // fetchUserData(user.email);
       } else {
         const fetchInterests = async () => {
           if (skiped) {
@@ -180,81 +180,110 @@ export default function FilterOffersResults({ navigation, route }) {
               description.includes(suggest.name) ||
               description.includes(searchKeyWord) ||
               additional_info?.Fonction?.includes(suggest.name) ||
-                additional_info?.Domaine?.includes(suggest.name) );
+              additional_info?.Domaine?.includes(suggest.name));
           // const includesSuggestedName = description.includes(suggest.name);
           return includesSearchKeyword;
         });
 
+      if (felterOptions) {
+        let filtredOffers = [];
+        const cities = felterOptions.city;
+        if (cities.length > 0) {
+          const offersByCity = [];
+
+          cities.forEach(city => {
+            offersData.map(offer => {
+              if (offer.general_info.City.includes(city)) {
+                offersByCity.push(offer);
+              }
+            }
+            )
+          });
+
+          filtredOffers = offersByCity;
+        }
+
+        const etudes = felterOptions.etudes;
+        if (etudes && etudes.length > 0) {
+          const offersByEtude = [];
+          filtredOffers.forEach(offer => {
+            if (offer.additional_info['Niveau d\'études'] === etudes) {
+              offersByEtude.push(offer);
+            }
+          });
+
+          filtredOffers = offersByEtude;
+        } else {
+          console.log('etudes is empty');
+        }
+
+        const types = felterOptions.internshipType;
+        if (types.length > 0) {
+          const offersByType = [];
+
+          types.forEach(type => {
+            filtredOffers.map(offer => {
+              if (offer.description.includes(type)) {
+                offersByType.push(offer);
+              }
+            }
+            )
+          });
+
+          filtredOffers = offersByType;
+
+        }
+
+        if ((types.length <= 0) && (etudes.length <= 0) && (cities.length <= 0)) {
+          console.log('No filter options selected');
+          filtredOffers = offersData;
+        }
+
+        const lastUpdateOption = felterOptions.lastUpdateOption;
+        if (lastUpdateOption && lastUpdateOption.length > 0) {
+          const offersByLastUpdate = [];
+
+          switch (lastUpdateOption) {
+            case 'Last Week':
+              filtredOffers.forEach(offer => {
+                const postedDate = new Date(offer.general_info.Posted_Date);
+                const lastWeek = new Date();
+                lastWeek.setDate(lastWeek.getDate() - 7);
+
+                if (postedDate > lastWeek) {
+                  offersByLastUpdate.push(offer);
+                }
+              });
+              break;
+
+            case 'Last Month':
+              filtredOffers.forEach(offer => {
+                const postedDate = new Date(offer.general_info.Posted_Date);
+                const lastMonth = new Date();
+                lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+                if (postedDate > lastMonth) {
+                  offersByLastUpdate.push(offer);
+                }
+              });
+              break;
+
+            case 'Anytime':
+              offersByLastUpdate.push(...filtredOffers);
+              break;
+
+            default:
+              break;
+          }
+
+          filtredOffers = offersByLastUpdate;
+        }
+
+        offersData = filtredOffers;
+      }
+
       // Sort offers by Posted_Date from newest to oldest
       offersData.sort((a, b) => new Date(b.general_info.Posted_Date) - new Date(a.general_info.Posted_Date));
-
-      if (felterOptions) {
-        offersData = offersData.filter((offer) => {
-            const { title, additional_info, general_info } = offer;
-            const includesSearchKeyword =
-                title.includes(searchKeyWord) ||
-                (additional_info?.Fonction?.includes(searchKeyWord));
-    
-            let cityMatch = false;
-            if (felterOptions.city.length > 0) {
-                for (let i = 0; i < felterOptions.city.length; i++) {
-                    const city = felterOptions.city[i];
-                    if (general_info.City === city) {
-                        cityMatch = true;
-                        break;
-                    }
-                }
-            } else {
-                cityMatch = true; // If no city filter, consider it a match
-            }
-    
-            let internshipTypeMatch = false;
-            if (felterOptions.internshipType.length > 0) {
-                for (let i = 0; i < felterOptions.internshipType.length; i++) {
-                    const type = felterOptions.internshipType[i];
-                    if (additional_info.Contrat === type) {
-                        internshipTypeMatch = true;
-                        break;
-                    }
-                }
-            } else {
-                internshipTypeMatch = true; // If no internshipType filter, consider it a match
-            }
-    
-            let etudesMatch = false;
-            if (felterOptions.etudes) {
-                if (additional_info['Niveau d\'études'] === felterOptions.etudes) {
-                    etudesMatch = true;
-                }
-            } else {
-                etudesMatch = true; // If no etudes filter, consider it a match
-            }
-    
-            let lastUpdateOptionMatch = false;
-            if (felterOptions.lastUpdateOption) {
-                // Add logic here to check last update option
-                // lastUpdateOptionMatch = ...
-            } else {
-                lastUpdateOptionMatch = true; // If no lastUpdateOption filter, consider it a match
-            }
-    
-            let workPlaceMatch = false;
-            if (felterOptions.workPlace.length > 0) {
-                for (let i = 0; i < felterOptions.workPlace.length; i++) {
-                    const place = felterOptions.workPlace[i];
-                    // Add logic here to check work place
-                    // workPlaceMatch = ...
-                }
-            } else {
-                workPlaceMatch = true; // If no workPlace filter, consider it a match
-            }
-    
-            return includesSearchKeyword && cityMatch && internshipTypeMatch && etudesMatch && lastUpdateOptionMatch && workPlaceMatch;
-        });
-    }
-    
-      // general_info?.City?.includes(searchKeyWord)
-
 
       // Set data and loading state after all offers have been fetched and sorted
       setOffers(offersData);
@@ -269,6 +298,15 @@ export default function FilterOffersResults({ navigation, route }) {
   useEffect(() => {
     fetchOffers();
   }, []);
+
+  useEffect(() => {
+    // Fetch offers when filter options change
+    if (route.params.filterOptions) {
+      setLoading(true);
+      fetchOffers();
+      setLoading(false);
+    }
+  }, [route.params.filterOptions]);
 
   const handleOfferPress = (offer) => {
     navigation1.navigate('OfferdetailPage', { offer });
@@ -370,7 +408,7 @@ export default function FilterOffersResults({ navigation, route }) {
 
       {felterOptions ?
         <View style={styles.section}>
-          <View style={styles.optionsTag}>
+          {/* <View style={styles.optionsTag}>
             <TouchableOpacity
               style={[
                 styles.tag,
@@ -415,7 +453,7 @@ export default function FilterOffersResults({ navigation, route }) {
                 selectedTag.includes('Unpaid') && { color: 'white' },
               ]}>Unpaid</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
         </View>
         :

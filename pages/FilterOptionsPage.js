@@ -6,12 +6,12 @@ import { useNavigation } from '@react-navigation/native';
 export default function FilterOptionsPage({route}) {
     const navigation = useNavigation();
 
-    const LastOptions = route.params?.filterOptions || [];
+    const LastOptions = route.params?.felterOptions;
     const suggest = route.params?.suggest;
-    console.log('LastOptions:', LastOptions);
+    LastOptions ? console.log('LastOptions:', LastOptions) : console.log('No Last Options');
 
     const [lastUpdateOpen, setLastUpdateOpen] = useState(true);
-    const [lastUpdateOption, setLastUpdateOption] = useState('Anytime');
+    const [lastUpdateOption, setLastUpdateOption] = useState(LastOptions ? LastOptions.lastUpdateOption : 'Anytime');
 
     const updateLastUpdateOption = (option) => {
         setLastUpdateOption(option);
@@ -19,7 +19,7 @@ export default function FilterOptionsPage({route}) {
 
     // workplace functions
     const [workplaceOpen, setWorkplaceOpen] = useState(true);
-    const [selectedWorkplaceOptions, setSelectedWorkplaceOptions] = useState([]);
+    const [selectedWorkplaceOptions, setSelectedWorkplaceOptions] = useState(LastOptions ? LastOptions.workPlace : []);
 
     const updateWorkplaceOption = (option) => {
         console.log('Option:', option);
@@ -34,7 +34,7 @@ export default function FilterOptionsPage({route}) {
 
     // internship type functions
     const [internshipTypeOpen, setInternshipTypeOpen] = useState(true);
-    const [selectedInternshipType, setSelectedInternshipType] = useState([]);
+    const [selectedInternshipType, setSelectedInternshipType] = useState(LastOptions ? LastOptions.internshipType : []);
 
     const updateInternshipType = (type) => {
         const index = selectedInternshipType.indexOf(type);
@@ -50,7 +50,7 @@ export default function FilterOptionsPage({route}) {
 
     // cities functions
     const [cityOpen, setCityOpen] = useState(true);
-    const [selectedCities, setSelectedCities] = useState([]);
+    const [selectedCities, setSelectedCities] = useState(LastOptions ? LastOptions.city : []);
 
     const updateCityOption = (city) => {
         const index = selectedCities.indexOf(city);
@@ -66,7 +66,7 @@ export default function FilterOptionsPage({route}) {
 
     // etude functions 
     const [etudesOpen, setEtudesOpen] = useState(true);
-    const [selectedEtudesOption, setSelectedEtudesOption] = useState('');
+    const [selectedEtudesOption, setSelectedEtudesOption] = useState(LastOptions ? LastOptions.etudes : '');
 
     const updateEtudesOption = (option) => {
         setSelectedEtudesOption(option);
@@ -76,7 +76,6 @@ export default function FilterOptionsPage({route}) {
 
         const filterOptions = {
             lastUpdateOption: lastUpdateOption,
-            workPlace: selectedWorkplaceOptions,
             city: selectedCities,
             internshipType: selectedInternshipType,
             etudes: selectedEtudesOption,
@@ -110,11 +109,11 @@ export default function FilterOptionsPage({route}) {
                     {lastUpdateOpen && (
                         <View style={styles.options}>
                             <TouchableOpacity
-                                style={[styles.radioButton, lastUpdateOption === 'Recent' && styles.radioButtonSelected]}
-                                onPress={() => updateLastUpdateOption('Recent')}>
-                                <View style={[styles.radioButtonCircle, lastUpdateOption === 'Recent' && styles.radioButtonCircleSelected]}>
+                                style={[styles.radioButton, lastUpdateOption === 'Anytime' && styles.radioButtonSelected]}
+                                onPress={() => updateLastUpdateOption('Anytime')}>
+                                <View style={[styles.radioButtonCircle, lastUpdateOption === 'Anytime' && styles.radioButtonCircleSelected]}>
                                 </View>
-                                <Text>Recent</Text>
+                                <Text>Anytime</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.radioButton, lastUpdateOption === 'Last Week' && styles.radioButtonSelected]}
@@ -130,18 +129,11 @@ export default function FilterOptionsPage({route}) {
                                 </View>
                                 <Text>Last Month</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.radioButton, lastUpdateOption === 'Anytime' && styles.radioButtonSelected]}
-                                onPress={() => updateLastUpdateOption('Anytime')}>
-                                <View style={[styles.radioButtonCircle, lastUpdateOption === 'Anytime' && styles.radioButtonCircleSelected]}>
-                                </View>
-                                <Text>Anytime</Text>
-                            </TouchableOpacity>
                         </View>
                     )}
                 </View>
 
-                {/* section for type of workplace */}
+                {/* 
                 <View style={styles.section}>
                     <TouchableOpacity onPress={() => setWorkplaceOpen(!workplaceOpen)}>
 
@@ -199,7 +191,7 @@ export default function FilterOptionsPage({route}) {
                             </TouchableOpacity>
                         </View>
                     )}
-                </View>
+                </View> */}
 
                 {/* section for internship type */}
                 <View style={styles.section}>
@@ -218,12 +210,12 @@ export default function FilterOptionsPage({route}) {
                             <TouchableOpacity
                                 style={[
                                     styles.tag,
-                                    selectedInternshipType.includes('Paid') && { backgroundColor: '#0f52d4' },
+                                    selectedInternshipType.includes('rémunéré') && { backgroundColor: '#0f52d4' },
                                 ]}
-                                onPress={() => updateInternshipType('Paid')}>
+                                onPress={() => updateInternshipType('rémunéré')}>
                                 <Text style={[
                                     styles.tagText,
-                                    selectedInternshipType.includes('Paid') && { color: 'white' },
+                                    selectedInternshipType.includes('rémunéré') && { color: 'white' },
                                 ]}>Paid</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -240,24 +232,13 @@ export default function FilterOptionsPage({route}) {
                             <TouchableOpacity
                                 style={[
                                     styles.tag,
-                                    selectedInternshipType.includes('Pre-Employment') && { backgroundColor: '#0f52d4' },
+                                    selectedInternshipType.includes('pré-embauche') && { backgroundColor: '#0f52d4' },
                                 ]}
-                                onPress={() => updateInternshipType('Pre-Employment')}>
+                                onPress={() => updateInternshipType('pré-embauche')}>
                                 <Text style={[
                                     styles.tagText,
-                                    selectedInternshipType.includes('Pre-Employment') && { color: 'white' },
+                                    selectedInternshipType.includes('pré-embauche') && { color: 'white' },
                                 ]}>Pre-Employment</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[
-                                    styles.tag,
-                                    selectedInternshipType.includes('Unpaid') && { backgroundColor: '#0f52d4' },
-                                ]}
-                                onPress={() => updateInternshipType('Unpaid')}>
-                                <Text style={[
-                                    styles.tagText,
-                                    selectedInternshipType.includes('Unpaid') && { color: 'white' },
-                                ]}>Unpaid</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -354,47 +335,56 @@ export default function FilterOptionsPage({route}) {
                             <TouchableOpacity
                                 style={[
                                     styles.radioButton,
-                                    selectedEtudesOption === 'Bac+1' && styles.radioButtonSelected
+                                    selectedEtudesOption === '' && styles.radioButtonSelected
                                 ]}
-                                onPress={() => updateEtudesOption('Bac+1')}>
-                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac+1' && styles.radioButtonCircleSelected]}></View>
-                                <Text>Bac+1</Text>
+                                onPress={() => updateEtudesOption('')}>
+                                <View style={[styles.radioButtonCircle, selectedEtudesOption === '' && styles.radioButtonCircleSelected]}></View>
+                                <Text>All</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[
                                     styles.radioButton,
-                                    selectedEtudesOption === 'Bac+2' && styles.radioButtonSelected
+                                    selectedEtudesOption === 'Bac plus 1' && styles.radioButtonSelected
                                 ]}
-                                onPress={() => updateEtudesOption('Bac+2')}>
-                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac+2' && styles.radioButtonCircleSelected]}></View>
-                                <Text>Bac+2</Text>
+                                onPress={() => updateEtudesOption('Bac plus 1')}>
+                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac plus 1' && styles.radioButtonCircleSelected]}></View>
+                                <Text>Bac plus 1</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[
                                     styles.radioButton,
-                                    selectedEtudesOption === 'Bac+3' && styles.radioButtonSelected
+                                    selectedEtudesOption === 'Bac plus 2' && styles.radioButtonSelected
                                 ]}
-                                onPress={() => updateEtudesOption('Bac+3')}>
-                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac+3' && styles.radioButtonCircleSelected]}></View>
-                                <Text>Bac+3</Text>
+                                onPress={() => updateEtudesOption('Bac plus 2')}>
+                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac plus 2' && styles.radioButtonCircleSelected]}></View>
+                                <Text>Bac plus 2</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[
                                     styles.radioButton,
-                                    selectedEtudesOption === 'Bac+4' && styles.radioButtonSelected
+                                    selectedEtudesOption === 'Bac plus 3' && styles.radioButtonSelected
                                 ]}
-                                onPress={() => updateEtudesOption('Bac+4')}>
-                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac+4' && styles.radioButtonCircleSelected]}></View>
-                                <Text>Bac+4</Text>
+                                onPress={() => updateEtudesOption('Bac plus 3')}>
+                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac plus 3' && styles.radioButtonCircleSelected]}></View>
+                                <Text>Bac plus 3</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[
                                     styles.radioButton,
-                                    selectedEtudesOption === 'Bac+5' && styles.radioButtonSelected
+                                    selectedEtudesOption === 'Bac plus 4' && styles.radioButtonSelected
                                 ]}
-                                onPress={() => updateEtudesOption('Bac+5')}>
-                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac+5' && styles.radioButtonCircleSelected]}></View>
-                                <Text>Bac+5</Text>
+                                onPress={() => updateEtudesOption('Bac plus 4')}>
+                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac plus 4' && styles.radioButtonCircleSelected]}></View>
+                                <Text>Bac plus 4</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[
+                                    styles.radioButton,
+                                    selectedEtudesOption === 'Bac plus 5' && styles.radioButtonSelected
+                                ]}
+                                onPress={() => updateEtudesOption('Bac plus 5')}>
+                                <View style={[styles.radioButtonCircle, selectedEtudesOption === 'Bac plus 5' && styles.radioButtonCircleSelected]}></View>
+                                <Text>Bac plus 5</Text>
                             </TouchableOpacity>
                         </View>
                     )}

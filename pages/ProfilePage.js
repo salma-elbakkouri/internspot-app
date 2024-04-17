@@ -9,7 +9,6 @@ import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, u
 import { db } from '../config/firebase';
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
-import * as DocumentPicker from 'expo-document-picker';
 import * as IntentLauncher from 'expo-intent-launcher';
 
 
@@ -72,23 +71,180 @@ export default function ProfilePage({ navigation }) {
     );
   };
 
+  const formatDateRange = (startDateStr, endDateStr) => {
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    // Get the month and year for the start date
+    const startMonthYear = startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+    // Get the month and year for the end date
+    const endMonthYear = endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+    return `${startMonthYear} - ${endMonthYear}`;
+};
+
   const generateAndPrintCV = async () => {
     try {
-      // Generate HTML content for the CV
+      // Check if user data is available
+      if (!user || !user.firstName || !user.lastName || !user.email || !user.phoneNumber || !user.educations || !user.experiences || !user.skills) {
+        // Show alert to complete profile
+        Alert.alert(
+            'Complete Your Profile',
+            'Please complete your profile before generating your CV.',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Complete Profile',
+                    onPress: () => {
+                        // Redirect to profile setup page
+                        navigation.navigate('ProfilesetupPage', { user: user, completProfile: true });
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
+        return; // Stop execution if user data is incomplete
+    }
+
+    // Generate HTML content for the CV
       const htmlContent = `
-        <html>
-          <head>
-            <style>
-              /* Add your CSS styles here */
-            </style>
-          </head>
-          <body>
-            <h1>CV</h1>
-            <p>Name: ${user.firstName}</p>
-            <p>Email: ${user.email}</p>
-            <!-- Add more HTML content as needed -->
-          </body>
-        </html>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Resume</title>
+          <style>
+              * {
+                  box-sizing: border-box;
+                  margin: 0;
+                  padding: 0;
+              }
+      
+              body {
+                  font-family: Arial, sans-serif;
+                  line-height: 1.6;
+              }
+      
+              h1, h2, h3, h4, h5, h6 {
+                  line-height: 1.2;
+              }
+      
+              p {
+                  margin-bottom: 10px;
+              }
+      
+              .container {
+                  max-width: 800px;
+                  margin: 0 auto;
+                  overflow: hidden;
+              }
+      
+              .header {
+                  background-color: #f4f4f4;
+                  padding: 20px;
+                  text-align: center;
+              }
+      
+              .header img {
+                  width: 150px;
+                  height: 150px;
+                  border-radius: 50%;
+                  object-fit: cover;
+              }
+      
+              .main-content {
+                  padding: 20px;
+              }
+      
+              .section {
+                  margin-bottom: 30px;
+              }
+      
+              .section-title {
+                  font-size: 1.5em;
+                  margin-bottom: 10px;
+              }
+      
+              .section-title::after {
+                  content: '';
+                  display: block;
+                  width: 50px;
+                  height: 3px;
+                  background-color: #333;
+                  margin: 10px auto;
+              }
+      
+              .section-content {
+                  margin-left: 1em;
+              }
+      
+              @media screen and (max-width: 768px) {
+                  .header img {
+                      width: 100px;
+                      height: 100px;
+                  }
+              }
+          </style>
+      </head>
+      <body>
+      
+      <div class="container">
+          <div class="header">
+              <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}" alt="Profile Picture">
+              <h1>${user.firstName} ${user.lastName}</h1>
+              <p>Student</p>
+              <p>Email: ${user.email} | Phone: ${user.phoneNumber}</p>
+          </div>
+      
+          <div class="main-content">
+      
+              <div class="section" id="education">
+                  <h2 class="section-title">Education</h2>
+                  ${
+                    user.educations.map((edu) => `
+                      <div class="section-content">
+                          <p><strong>${edu.degree}</strong>,</p>
+                          <p><strong>${edu.school}</strong>, ${formatDateRange(edu.start_date, edu.end_date)}</p>
+                          <p>${edu.description}</p>
+                      </div>
+                    `).join('')
+                  }
+              </div>
+      
+              <div class="section" id="experience">
+                  <h2 class="section-title">Work Experience</h2>
+                  ${
+                    user.experiences.map((exp) => `
+                      <div class="section-content">
+                          <p><strong>${exp.post_title}</strong></p>
+                          <p><strong>${exp.company}</strong>, ${exp.specialization}, ${exp.location}, ${formatDateRange(exp.start_date, exp.end_date)}</p>
+                          <p>${exp.description}</p>
+                      </div>
+                    `).join('')
+                  }
+              </div>
+      
+              <div class="section" id="skills">
+                  <h2 class="section-title">Skills</h2>
+                  <div class="section-content">
+                    ${
+                      user.skills.map((skill) => `
+                        <span style="padding: 5px 10px; background-color: #f4f4f4; border-radius: 5px; margin-right: 10px; margin-top: 6px;">${skill}</span>
+                      `).join('')
+                    }
+                  </div>
+              </div>
+      
+          </div>
+      </div>
+      
+      </body>
+      </html>
       `;
 
       // Generate PDF from HTML
@@ -99,22 +255,18 @@ export default function ProfilePage({ navigation }) {
         throw new Error('Generated PDF URI is invalid.');
       }
 
-      // Define the destination file path
-      const destinationUri = `${FileSystem.documentDirectory}cv.pdf`;
+      // Get content URI for the PDF file
+      const cUri = await FileSystem.getContentUriAsync(uri);
 
-      // Move the PDF file to the destination path
-      await FileSystem.moveAsync({
-        from: uri,
-        to: destinationUri,
+      // Launch default PDF viewer activity
+      await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+        data: cUri,
+        flags: 1,
+        type: "application/pdf",
       });
 
       // Show success message
       Alert.alert('CV Downloaded', 'Your CV has been downloaded successfully.');
-
-      await IntentLauncher.startActivityAsync(IntentLauncher.ACTION_VIEW, {
-        data: destinationUri,
-        flags: ['FLAG_GRANT_READ_URI_PERMISSION'], // Add this line to grant read permission to the URI
-      });
     } catch (error) {
       console.error('Error downloading CV:', error);
       Alert.alert('Error', 'An error occurred while downloading the CV.');

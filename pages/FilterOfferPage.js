@@ -21,7 +21,7 @@ export default function FilterOffersPage({ navigation, route }) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const q = query(collection(db, 'suggestions'), orderBy('count', 'desc'), limit(7));
+            const q = query(collection(db, 'suggestions'), orderBy('count', 'desc'));
             const querySnapshot = await getDocs(q);
             const data = [];
             querySnapshot.forEach(doc => {
@@ -155,6 +155,8 @@ const styles = StyleSheet.create({
     suggetionsBlock: {
         marginBottom: 50,
         marginLeft: 20,
+        height: 550,
+        width: '100%',
     },
     searchInput: {
         width: '100%',
@@ -174,6 +176,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
     },
     applyButtonContainer: {
+        zIndex: 999,
         height: 70,
         position: 'absolute',
         bottom: 0,
