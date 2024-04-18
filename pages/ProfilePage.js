@@ -132,7 +132,7 @@ export default function ProfilePage({ navigation, route }) {
       }
 
       // Generate HTML content for the CV
-      const htmlContent = `
+      const resumeModel2 = `
       <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -255,7 +255,7 @@ export default function ProfilePage({ navigation, route }) {
                         <p><strong>${exp.company}</strong>, ${exp.specialization}, ${exp.location}, ${formatDateRange(exp.start_date, exp.end_date)}</p>
                         <p>${exp.description}</p>
                     </div>
-                `).join('') }
+                `).join('')}
         </div>
 
         <div class="section" id="skills">
@@ -606,30 +606,57 @@ export default function ProfilePage({ navigation, route }) {
 </html>
       `;
 
-      // Generate PDF from HTML
-      const { uri } = await Print.printToFileAsync({ html: resumeModel1 });
 
-      // Check if URI is valid
-      if (!uri) {
-        throw new Error('Generated PDF URI is invalid.');
-      }
-
-      // Get content URI for the PDF file
-      const cUri = await FileSystem.getContentUriAsync(uri);
-
-      // Launch default PDF viewer activity
-      await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
-        data: cUri,
-        flags: 1,
-        type: "application/pdf",
-      });
-
-      // Show success message
-      Alert.alert('CV Downloaded', 'Your CV has been downloaded successfully.');
+      Alert.alert(
+        'Choose Resume Model',
+        'Please choose a resume model before generating your CV.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Model 1',
+            onPress: async () => {
+              await generatePDF(resumeModel1);
+            },
+          },
+          {
+            text: 'Model 2',
+            onPress: async () => {
+              await generatePDF(resumeModel2);
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       console.error('Error downloading CV:', error);
       Alert.alert('Error', 'An error occurred while downloading the CV.');
     }
+  };
+
+  const generatePDF = async (htmlContent) => {
+    // Generate PDF from HTML
+    const { uri } = await Print.printToFileAsync({ html: htmlContent });
+
+    // Check if URI is valid
+    if (!uri) {
+      throw new Error('Generated PDF URI is invalid.');
+    }
+
+    // Get content URI for the PDF file
+    const cUri = await FileSystem.getContentUriAsync(uri);
+
+    // Launch default PDF viewer activity
+    await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+      data: cUri,
+      flags: 1,
+      type: "application/pdf",
+    });
+
+    // Show success message
+    Alert.alert('CV Downloaded', 'Your CV has been downloaded successfully.');
   };
 
   const MenuItem = ({ icon, text, onPress }) => (
