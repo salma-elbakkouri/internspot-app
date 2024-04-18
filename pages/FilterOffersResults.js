@@ -223,7 +223,7 @@ export default function FilterOffersResults({ navigation, route }) {
 
           types.forEach(type => {
             filtredOffers.map(offer => {
-              if (offer.description.includes(type)) {
+              if (offer.description.includes(type) || offer.title.includes(type)) {
                 offersByType.push(offer);
               }
             }
