@@ -80,7 +80,7 @@ export default function EditProfilePage({ navigation, route }) {
                     profileImageUrl: imageUrl // Add the image URL to the user document
                 });
 
-
+                navigation1.goBack();
             } catch (error) {
                 console.error('Error updating data: ', error);
                 Alert.alert('Error', 'Failed to update data. Please try again later.');
@@ -91,33 +91,19 @@ export default function EditProfilePage({ navigation, route }) {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                console.log("User logged in:", user.email); // Log to check the user's email
-                try {
-                    const q = query(collection(db, 'users'), where('email', '==', user.email));
-                    const querySnapshot = await getDocs(q);
-                    if (!querySnapshot.empty) {
-                        const userDocSnapshot = querySnapshot.docs[0];
-                        setUserId(userDocSnapshot.id);
-                        setUser(userDocSnapshot.data());
-                        console.log("User data set successfully:", userDocSnapshot.data()); // Log success
-                    } else {
-                        console.log("No user data available");
-                    }
-                } catch (error) {
-                    console.error('Error fetching user data:', error);
-                }
+                const q = query(collection(db, 'users'), where('email', '==', user.email));
+                const querySnapshot = await getDocs(q);
+                const userDocSnapshot = querySnapshot.docs[0];
+                setUserId(userDocSnapshot.id);
+                setUser(userDocSnapshot.data());
                 setIsUserLoggedIn(true);
             } else {
-                console.log("No user logged in"); // Confirm no user logged in
-                setUser(null);
                 setIsUserLoggedIn(false);
             }
         });
 
         return () => unsubscribe();
     }, []);
-
-
 
     useEffect(() => {
         if (user) {
@@ -146,11 +132,6 @@ export default function EditProfilePage({ navigation, route }) {
     };
 
     const fetchUserData = async () => {
-        if (!user) {
-            console.log("No user logged in");
-            return;
-        }
-
         try {
             const q = query(collection(db, 'users'), where('email', '==', user.email));
             const querySnapshot = await getDocs(q);
@@ -161,7 +142,6 @@ export default function EditProfilePage({ navigation, route }) {
             console.error('Error fetching user data: ', error);
         }
     };
-
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -179,17 +159,13 @@ export default function EditProfilePage({ navigation, route }) {
             return;
         }
 
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,  // Ensure only images are picked
-            quality: 1, // Use max quality
-        });
+        let result = await ImagePicker.launchImageLibraryAsync();
 
         if (!result.cancelled) {
             const uri = result.assets[0].uri;
-            setSelectedImage({ uri: uri });  // Update state with new image URI
+            setSelectedImage({ uri: uri });
         }
     };
-
 
     const handleRemoveEducation = async (index) => {
         try {
@@ -259,7 +235,7 @@ export default function EditProfilePage({ navigation, route }) {
             {/* Profile Details */}
             <ImageBackground source={require('../assets/bgimage.png')} style={styles.profileDetails}>
                 <TouchableOpacity style={styles.backButton} onPress={() => {
-                    navigation1.goBack();
+                    navigation.goBack();
                 }}>
                     <FontAwesome name="chevron-left" size={24} color="#fff" />
                 </TouchableOpacity>
@@ -267,17 +243,16 @@ export default function EditProfilePage({ navigation, route }) {
                 <TouchableOpacity onPress={pickImage}>
                     <View style={styles.profileImageContainer}>
                         <Image
-                            source={selectedImage ? { uri: selectedImage.uri } : require('../assets/img-placeholder.png')}
+                            source={profilePic ? { uri: user.profileImageUrl } : require('../assets/img-placeholder.png')}
                             style={styles.profileImage}
                         />
                     </View>
                 </TouchableOpacity>
 
-
-
                 {/* Save button */}
                 <TouchableOpacity style={styles.saveButton} onPress={handelSave}>
                     <Text style={styles.editProfileButtonText}>Save</Text>
+                    <FontAwesome name="bookmark" size={22} color="#fff" />
                 </TouchableOpacity>
             </ImageBackground>
             <ScrollView style={styles.formContainer}>
@@ -348,7 +323,7 @@ export default function EditProfilePage({ navigation, route }) {
                             <Ionicons name="add" size={24} color="#0047D2" />
                         </TouchableOpacity>
                     </View>
-                    {educations.map((education, index) => {
+                    {educations ? educations.map((education, index) => {
                         return (
                             <View key={index} style={styles.educationItemBlock}>
                                 <View style={styles.educationItem}>
@@ -364,7 +339,9 @@ export default function EditProfilePage({ navigation, route }) {
                                 </TouchableOpacity>
                             </View>
                         );
-                    })}
+                    }) : 
+                        <Text style={{ color: 'gray' }}>No education added</Text>
+                    }
 
                 </View>
 
@@ -380,7 +357,7 @@ export default function EditProfilePage({ navigation, route }) {
                             <Ionicons name="add" size={24} color="#0047D2" />
                         </TouchableOpacity>
                     </View>
-                    {experiences.map((experience, index) => {
+                    {experiences ? experiences.map((experience, index) => {
                         return (
                             <View key={index} style={styles.educationItemBlock}>
                                 <View style={styles.educationItem}>
@@ -398,7 +375,9 @@ export default function EditProfilePage({ navigation, route }) {
                                 </TouchableOpacity>
                             </View>
                         );
-                    })}
+                    }) : 
+                        <Text style={{ color: 'gray' }}>No experience added</Text>
+                    }
                 </View>
 
                 <View style={styles.skillsBock}>
@@ -414,7 +393,7 @@ export default function EditProfilePage({ navigation, route }) {
                         </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                        {userSkills.map((skill, index) => (
+                        {userSkills ? userSkills.map((skill, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={[
@@ -425,7 +404,9 @@ export default function EditProfilePage({ navigation, route }) {
                                     {skill}
                                 </Text>
                             </TouchableOpacity>
-                        ))}
+                        )) : 
+                            <Text style={{ color: 'gray' }}>No skills added</Text>
+                        }
                     </View>
                 </View>
             </ScrollView>
@@ -442,7 +423,7 @@ const styles = StyleSheet.create({
     profileDetails: {
         alignItems: 'center',
         marginTop: 30,
-        paddingVertical: 60,
+        paddingVertical: 20,
     },
     profileImageContainer: {
         width: 100,
@@ -481,8 +462,8 @@ const styles = StyleSheet.create({
         zIndex: 999,
         height: 'auto',
         width: 'auto',
-        paddingHorizontal: 17,
-        paddingVertical: 6,
+        padding: 5,
+        paddingHorizontal: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.2)',

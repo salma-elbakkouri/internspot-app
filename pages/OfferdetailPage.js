@@ -128,17 +128,17 @@ const OfferdetailsPage = ({ route, navigation }) => {
             const userData = querySnapshot.docs[0].data();
             const appliedOffers = userData.appliedOffers || [];
             const docRef = querySnapshot.docs[0].ref;
-
+    
             // Check if the offer ID already exists in the appliedOffers array
             if (!appliedOffers.includes(offer.id)) {
                 // If the offer ID is not already in the array, push it
                 appliedOffers.push(offer.id);
-
+    
                 // Update the document with the updated appliedOffers array
                 await updateDoc(docRef, {
                     appliedOffers: appliedOffers,
                 });
-
+    
                 setApplied(false);
             } else {
                 // If the offer ID already exists, you can handle it here (maybe show a message or perform some other action)

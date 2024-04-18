@@ -54,15 +54,14 @@ export default function LoginPage({route}) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const userData = userCredential.user;
 
-
-      if (!userData.emailVerified) {
-        Alert.alert(
-          'Email Verification Required',
-          'Please verify your email before logging in. Check your inbox for verification instructions.'
-        );
-        // You may choose to send a verification email again here if needed
-        return;
-      }
+      // if (!userData.emailVerified) {
+      //   Alert.alert(
+      //     'Email Verification Required',
+      //     'Please verify your email before logging in. Check your inbox for verification instructions.'
+      //   );
+      //   // You may choose to send a verification email again here if needed
+      //   return;
+      // }
 
 
       setEmail('');
