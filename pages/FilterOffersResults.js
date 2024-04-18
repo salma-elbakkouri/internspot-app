@@ -427,7 +427,8 @@ export default function FilterOffersResults({ navigation, route }) {
         <View style={styles.section}>
           <ScrollView horizontal={true}>
             <View style={styles.optionsTag}>
-              {felterOptions.etudes.length > 0 ? (
+
+              {felterOptions.lastUpdateOption.length > 0 ? (
                 <TouchableOpacity
                   style={[styles.tag, { backgroundColor: '#0f52d4' }]}>
                   <Text style={[styles.tagText, { color: 'white' }]}>
