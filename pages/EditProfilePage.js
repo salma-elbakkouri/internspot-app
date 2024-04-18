@@ -118,15 +118,15 @@ export default function EditProfilePage({ navigation, route }) {
 
     useEffect(() => {
         if (user) {
-            setFirstName(user.firstName);
-            setLastName(user.lastName);
-            setPhoneNumber(user.phoneNumber);
-            setState(user.state);
-            setEmail(user.email);
-            setUserSkills(user.skills);
-            setEducations(user.educations);
-            setExperiences(user.experiences);
-            setProfilePic(user.profileImageUrl);
+            setFirstName(user.firstName || '');
+            setLastName(user.lastName || '');
+            setPhoneNumber(user.phoneNumber || '');
+            setState(user.state || '');
+            setEmail(user.email || '');
+            setUserSkills(user.skills || []);
+            setEducations(user.educations || []);
+            setExperiences(user.experiences || []);
+            setProfilePic(user.profileImageUrl || '');
         }
     }, [user]);
 
@@ -144,11 +144,21 @@ export default function EditProfilePage({ navigation, route }) {
 
     const fetchUserData = async () => {
         try {
+            if (!user || !user.email) {
+                console.log('User object or email is null');
+                return;
+            }
+    
             const q = query(collection(db, 'users'), where('email', '==', user.email));
             const querySnapshot = await getDocs(q);
             const userDocSnapshot = querySnapshot.docs[0];
-            setUserId(userDocSnapshot.id);
-            setUser(userDocSnapshot.data());
+            
+            if (userDocSnapshot) {
+                setUserId(userDocSnapshot.id);
+                setUser(userDocSnapshot.data());
+            } else {
+                console.error('User document not found');
+            }
         } catch (error) {
             console.error('Error fetching user data: ', error);
         }

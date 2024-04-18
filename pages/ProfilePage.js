@@ -13,10 +13,11 @@ import * as IntentLauncher from 'expo-intent-launcher';
 
 
 
-export default function ProfilePage({ navigation }) {
+export default function ProfilePage({ navigation, route }) {
   const navigation1 = useNavigation();
   const [user, setUser] = useState(null);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const reload = route.params?.reload;
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -33,6 +34,26 @@ export default function ProfilePage({ navigation }) {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const unsubscribeFocus = navigation1.addListener('focus', () => {
+      const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const q = query(collection(db, 'users'), where('email', '==', user.email));
+          const querySnapshot = await getDocs(q);
+          const userDocSnapshot = querySnapshot.docs[0];
+          setUser(userDocSnapshot.data());
+          setIsUserLoggedIn(true);
+        } else {
+          setIsUserLoggedIn(false);
+        }
+      });
+  
+      return () => unsubscribeAuth();
+    });
+
+    return () => unsubscribeFocus();
+}, [navigation1]);
 
   const handleLogout = async () => {
     // Show confirmation alert
