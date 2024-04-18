@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
@@ -390,7 +390,7 @@ export default function FilterOffersResults({ navigation, route }) {
               </View>
             </View>
             <View style={styles.companyContainer}>
-            <Image source={image} style={styles.logoImage} />
+              <Image source={image} style={styles.logoImage} />
               <View style={styles.companyDetails}>
                 <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{item.general_info.City}</Text>
@@ -423,59 +423,52 @@ export default function FilterOffersResults({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
-      {felterOptions ?
+      {felterOptions ? (
         <View style={styles.section}>
-          {/* <View style={styles.optionsTag}>
-            <TouchableOpacity
-              style={[
-                styles.tag,
-                selectedTag.includes('Paid') && { backgroundColor: '#0f52d4' },
-              ]}
-              onPress={() => updateTag('Paid')}>
-              <Text style={[
-                styles.tagText,
-                selectedTag.includes('Paid') && { color: 'white' },
-              ]}>Paid</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tag,
-                selectedTag.includes('PFE') && { backgroundColor: '#0f52d4' },
-              ]}
-              onPress={() => updateTag('PFE')}>
-              <Text style={[
-                styles.tagText,
-                selectedTag.includes('PFE') && { color: 'white' },
-              ]}>PFE</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tag,
-                selectedTag.includes('Pre-Employment') && { backgroundColor: '#0f52d4' },
-              ]}
-              onPress={() => updateTag('Pre-Employment')}>
-              <Text style={[
-                styles.tagText,
-                selectedTag.includes('Pre-Employment') && { color: 'white' },
-              ]}>Pre-Employment</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tag,
-                selectedTag.includes('Unpaid') && { backgroundColor: '#0f52d4' },
-              ]}
-              onPress={() => updateTag('Unpaid')}>
-              <Text style={[
-                styles.tagText,
-                selectedTag.includes('Unpaid') && { color: 'white' },
-              ]}>Unpaid</Text>
-            </TouchableOpacity>
-          </View> */}
+          <ScrollView horizontal={true}>
+            <View style={styles.optionsTag}>
+              {felterOptions.etudes.length > 0 ? (
+                <TouchableOpacity
+                  style={[styles.tag, { backgroundColor: '#0f52d4' }]}>
+                  <Text style={[styles.tagText, { color: 'white' }]}>
+                    {felterOptions.lastUpdateOption}
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
 
+              {felterOptions.city.length > 0 ? (
+                felterOptions.city.map((city, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.tag, { backgroundColor: '#0f52d4' }]}>
+                    <Text style={[styles.tagText, { color: 'white' }]}>{city}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : null}
+
+              {felterOptions.internshipType.length > 0 ? (
+                felterOptions.internshipType.map((type, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.tag, { backgroundColor: '#0f52d4' }]}>
+                    <Text style={[styles.tagText, { color: 'white' }]}>{type}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : null}
+
+              {felterOptions.etudes.length > 0 ? (
+                <TouchableOpacity
+                  style={[styles.tag, { backgroundColor: '#0f52d4' }]}>
+                  <Text style={[styles.tagText, { color: 'white' }]}>
+                    {felterOptions.etudes}
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          </ScrollView>
         </View>
-        :
-        null
-      }
+      ) : null}
+
       {loading ? (
         <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
       ) : (
@@ -624,8 +617,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   optionsTag: {
-    marginLeft: 20,
-    marginTop: 12,
     flexDirection: 'row',
     justifyContent: 'center',
   },
@@ -634,7 +625,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginRight: 10,
     marginBottom: 5,
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: 'lightgray',
   },
   tagText: {
