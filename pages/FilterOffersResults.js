@@ -328,6 +328,23 @@ export default function FilterOffersResults({ navigation, route }) {
   const renderItem = ({ item }) => {
     const index = offers.indexOf(item);
     const key = item.id + '-' + index;
+
+    const imagePaths = [
+      require('../assets/companies/c19.png'),
+      require('../assets/companies/c7.png'),
+      require('../assets/companies/c10.png'),
+      require('../assets/companies/c16.png'),
+      require('../assets/companies/c12.png'),
+      require('../assets/companies/c13.png'),
+      require('../assets/companies/c14.png'),
+      require('../assets/companies/c15.png'),
+      require('../assets/companies/c5.png'),
+      require('../assets/companies/c17.png'),
+      require('../assets/companies/c18.png'),
+      require('../assets/companies/c19.png'),
+    ];
+
+    const image = imagePaths[index % imagePaths.length];
     // Convert Posted_Date string to Date object
     const postedDate = new Date(item.general_info.Posted_Date);
 
@@ -358,8 +375,8 @@ export default function FilterOffersResults({ navigation, route }) {
     return (
       <View style={styles.offerContainer}>
         <TouchableOpacity style={styles.saveButton} onPress={() => handleSaveOffer(item)}>
-          <FontAwesome name="bookmark" size={24}
-            color={userSavedOffers.includes(item.id) ? 'black' : 'lightgray'}
+          <FontAwesome name="bookmark" size={22}
+            color={userSavedOffers.includes(item.id) ? '#0047D2' : 'lightgray'}
           ></FontAwesome>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleOfferPress(item)}>
@@ -373,7 +390,7 @@ export default function FilterOffersResults({ navigation, route }) {
               </View>
             </View>
             <View style={styles.companyContainer}>
-              <Image source={{ uri: 'https://data-assets.ams3.digitaloceanspaces.com/electriciansearch-co-uk/logos/default-logo.png?rand=162' }} style={styles.logoImage} />
+            <Image source={image} style={styles.logoImage} />
               <View style={styles.companyDetails}>
                 <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{item.general_info.City}</Text>
@@ -562,7 +579,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   titleText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 5,
     marginRight: 10,

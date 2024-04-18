@@ -47,7 +47,7 @@ function ApplicationOfferDetail({navigation, route}) {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {/* Offer picture */}
                 <Image
-                    source={require('../assets/companies/c5.png')}
+                    source={require('../assets/offerimg.jpg')}
                     style={styles.offerPicture}
                     resizeMode="contain"
                 />

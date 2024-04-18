@@ -102,10 +102,29 @@ export default function SavedPage({ navigation, route }) {
   const filterPageNavigate = () => {
     navigation1.navigate('FilterOffersPage');
   }
+  
 
   const renderItem = ({ item }) => {
     const index = offers.indexOf(item);
     const key = item.id + '-' + index;
+
+    const imagePaths = [
+      require('../assets/companies/c19.png'),
+      require('../assets/companies/c7.png'),
+      require('../assets/companies/c10.png'),
+      require('../assets/companies/c16.png'),
+      require('../assets/companies/c12.png'),
+      require('../assets/companies/c13.png'),
+      require('../assets/companies/c14.png'),
+      require('../assets/companies/c15.png'),
+      require('../assets/companies/c5.png'),
+      require('../assets/companies/c17.png'),
+      require('../assets/companies/c18.png'),
+      require('../assets/companies/c19.png'),
+    ];
+
+    const image = imagePaths[index % imagePaths.length];
+
     // Convert Posted_Date string to Date object
     const postedDate = new Date(item.general_info.Posted_Date);
 
@@ -151,7 +170,7 @@ export default function SavedPage({ navigation, route }) {
               </View>
             </View>
             <View style={styles.companyContainer}>
-              <Image source={require('../assets/companies/c5.png')} style={styles.logoImage} />
+            <Image source={image} style={styles.logoImage} />
               <View style={styles.companyDetails}>
                 <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
                 <Text style={styles.location}>{item.general_info.City}</Text>

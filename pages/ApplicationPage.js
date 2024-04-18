@@ -46,18 +46,32 @@ export default function ApplicationPage({ navigation }) {
     }
   };
 
-  const renderItem = ({ item }) => (
+  const imagePaths = [
+    require('../assets/companies/c19.png'),
+    require('../assets/companies/c7.png'),
+    require('../assets/companies/c10.png'),
+    require('../assets/companies/c16.png'),
+    require('../assets/companies/c12.png'),
+    require('../assets/companies/c13.png'),
+    require('../assets/companies/c14.png'),
+    require('../assets/companies/c15.png'),
+    require('../assets/companies/c5.png'),
+    require('../assets/companies/c17.png'),
+    require('../assets/companies/c18.png'),
+    require('../assets/companies/c19.png'),
+  ];
+
+  const renderItem = ({ item, index }) => (
     <View style={styles.applicationContainer}>
-      <Image source={require('../assets/companies/c5.png')} style={styles.companyIcon} />
-      <TouchableOpacity onPress={() => navigation1.navigate('ApplicationOfferDetail', { offer: item })}>
-        <View style={styles.applicationDetails}>
-          <Text style={styles.applicationTitle}>{item.title}</Text>
-          {/* Change this line to use item.additional_info.Entreprise */}
-          <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
+    <Image source={imagePaths[index % imagePaths.length]} style={styles.companyIcon} />
+    <TouchableOpacity onPress={() => navigation1.navigate('ApplicationOfferDetail', { offer: item })}>
+      <View style={styles.applicationDetails}>
+        <Text style={styles.applicationTitle}>{item.title}</Text>
+        <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
+      </View>
+    </TouchableOpacity>
+  </View>
+);
 
 
   return (
@@ -136,7 +150,7 @@ const styles = StyleSheet.create({
   companyIcon: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    marginRight:10,
   },
   applicationDetails: {
     flex: 1,
@@ -146,6 +160,7 @@ const styles = StyleSheet.create({
   applicationTitle: {
     fontSize: 14,
     fontWeight: 'bold',
+    marginRight:30,
   },
   companyName: {
     color: '#4A4A4A',

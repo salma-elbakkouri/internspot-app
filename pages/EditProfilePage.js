@@ -20,7 +20,7 @@ export default function EditProfilePage({ navigation, route }) {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [selectedImage, setSelectedImage] = useState(require('../assets/profilepic.png'));
     const reload = route.params?.reload;
-
+    const [profilePicUpdated, setProfilePicUpdated] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -59,28 +59,39 @@ export default function EditProfilePage({ navigation, route }) {
 
                 const userRef = doc(usersCollection, userDoc.id);
 
-                // Convert the selected image URI to a blob
-                const response = await fetch(selectedImage.uri);
-                const blob = await response.blob();
+                if (profilePicUpdated) {
+                    // Convert the selected image URI to a blob
+                    const response = await fetch(selectedImage.uri);
+                    const blob = await response.blob();
 
-                // Upload the image blob to Firebase Storage
-                const storage = getStorage();
-                const storageRef = ref(storage, `profileImages/${email}`);
-                await uploadBytes(storageRef, blob);
+                    // Upload the image blob to Firebase Storage
+                    const storage = getStorage();
+                    const storageRef = ref(storage, `profileImages/${email}`);
+                    await uploadBytes(storageRef, blob);
 
-                // Get the download URL of the uploaded image
-                const imageUrl = await getDownloadURL(storageRef);
+                    // Get the download URL of the uploaded image
+                    const imageUrl = await getDownloadURL(storageRef);
 
-                // Update Firestore document with user data including the image URL
-                await updateDoc(userRef, {
-                    firstName: firstName,
-                    lastName: lastName,
-                    phoneNumber: phoneNumber,
-                    state: state,
-                    profileImageUrl: imageUrl // Add the image URL to the user document
-                });
+                    // Update Firestore document with user data including the image URL
+                    await updateDoc(userRef, {
+                        firstName: firstName,
+                        lastName: lastName,
+                        phoneNumber: phoneNumber,
+                        state: state,
+                        profileImageUrl: imageUrl // Add the image URL to the user document
+                    });
+                }else{
+                    await updateDoc(userRef, {
+                        firstName: firstName,
+                        lastName: lastName,
+                        phoneNumber: phoneNumber,
+                        state: state,
+                    });
+                }
 
-                navigation1.goBack();
+
+
+                navigation1.navigate('Profile', { reload: true });
             } catch (error) {
                 console.error('Error updating data: ', error);
                 Alert.alert('Error', 'Failed to update data. Please try again later.');
@@ -164,6 +175,7 @@ export default function EditProfilePage({ navigation, route }) {
         if (!result.cancelled) {
             const uri = result.assets[0].uri;
             setSelectedImage({ uri: uri });
+            setProfilePicUpdated(true);
         }
     };
 
@@ -252,7 +264,6 @@ export default function EditProfilePage({ navigation, route }) {
                 {/* Save button */}
                 <TouchableOpacity style={styles.saveButton} onPress={handelSave}>
                     <Text style={styles.editProfileButtonText}>Save</Text>
-                    <FontAwesome name="bookmark" size={22} color="#fff" />
                 </TouchableOpacity>
             </ImageBackground>
             <ScrollView style={styles.formContainer}>
@@ -279,20 +290,6 @@ export default function EditProfilePage({ navigation, route }) {
                     value={lastName}
                     textContentType='name'
                 />
-
-                {/* <Text style={styles.label}>Date of birth</Text>
-                <View style={styles.datePickerContainer}>
-                    <TouchableOpacity onPress={showDatePicker}>
-                        <Text>{dateOfBirth.toString()}</Text>
-                    </TouchableOpacity>
-                    <DateTimePickerModal
-                        isVisible={isDatePickerVisible}
-                        mode="date"
-                        onConfirm={handleConfirm}
-                        onCancel={hideDatePicker}
-                        date={dateOfBirth}
-                    />
-                </View> */}
 
                 <Text style={styles.label}>State</Text>
                 <TextInput
@@ -339,7 +336,7 @@ export default function EditProfilePage({ navigation, route }) {
                                 </TouchableOpacity>
                             </View>
                         );
-                    }) : 
+                    }) :
                         <Text style={{ color: 'gray' }}>No education added</Text>
                     }
 
@@ -375,7 +372,7 @@ export default function EditProfilePage({ navigation, route }) {
                                 </TouchableOpacity>
                             </View>
                         );
-                    }) : 
+                    }) :
                         <Text style={{ color: 'gray' }}>No experience added</Text>
                     }
                 </View>
@@ -404,7 +401,7 @@ export default function EditProfilePage({ navigation, route }) {
                                     {skill}
                                 </Text>
                             </TouchableOpacity>
-                        )) : 
+                        )) :
                             <Text style={{ color: 'gray' }}>No skills added</Text>
                         }
                     </View>
