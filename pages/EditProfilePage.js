@@ -127,6 +127,7 @@ export default function EditProfilePage({ navigation, route }) {
             setEducations(user.educations || []);
             setExperiences(user.experiences || []);
             setProfilePic(user.profileImageUrl || '');
+            setSelectedImage({ uri: user.profileImageUrl });
         }
     }, [user]);
 
@@ -148,11 +149,11 @@ export default function EditProfilePage({ navigation, route }) {
                 console.log('User object or email is null');
                 return;
             }
-    
+
             const q = query(collection(db, 'users'), where('email', '==', user.email));
             const querySnapshot = await getDocs(q);
             const userDocSnapshot = querySnapshot.docs[0];
-            
+
             if (userDocSnapshot) {
                 setUserId(userDocSnapshot.id);
                 setUser(userDocSnapshot.data());
@@ -185,6 +186,7 @@ export default function EditProfilePage({ navigation, route }) {
         if (!result.cancelled) {
             const uri = result.assets[0].uri;
             setSelectedImage({ uri: uri });
+            console.log('Selected image: ', selectedImage.uri);
             setProfilePicUpdated(true);
         }
     };
@@ -202,7 +204,7 @@ export default function EditProfilePage({ navigation, route }) {
             const userDoc = querySnapshot.docs[0];
 
             const userRef = doc(usersCollection, userDoc.id);
-
+            
             await updateDoc(userRef, {
                 educations: updatedEducations,
             });
@@ -227,7 +229,7 @@ export default function EditProfilePage({ navigation, route }) {
             const userDoc = querySnapshot.docs[0];
 
             const userRef = doc(usersCollection, userDoc.id);
-
+            
             await updateDoc(userRef, {
                 experiences: updatedExperiences,
             });
@@ -265,7 +267,8 @@ export default function EditProfilePage({ navigation, route }) {
                 <TouchableOpacity onPress={pickImage}>
                     <View style={styles.profileImageContainer}>
                         <Image
-                            source={profilePic ? { uri: user.profileImageUrl } : require('../assets/img-placeholder.png')}
+                            // source={profilePic ? { uri: user.profileImageUrl } : require('../assets/img-placeholder.png')}
+                            source={selectedImage}
                             style={styles.profileImage}
                         />
                     </View>
@@ -274,6 +277,7 @@ export default function EditProfilePage({ navigation, route }) {
                 {/* Save button */}
                 <TouchableOpacity style={styles.saveButton} onPress={handelSave}>
                     <Text style={styles.editProfileButtonText}>Save</Text>
+                    <FontAwesome name="bookmark" size={22} color="#fff" />
                 </TouchableOpacity>
             </ImageBackground>
             <ScrollView style={styles.formContainer}>
@@ -300,6 +304,20 @@ export default function EditProfilePage({ navigation, route }) {
                     value={lastName}
                     textContentType='name'
                 />
+
+                {/* <Text style={styles.label}>Date of birth</Text>
+                <View style={styles.datePickerContainer}>
+                    <TouchableOpacity onPress={showDatePicker}>
+                        <Text>{dateOfBirth.toString()}</Text>
+                    </TouchableOpacity>
+                    <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode="date"
+                        onConfirm={handleConfirm}
+                        onCancel={hideDatePicker}
+                        date={dateOfBirth}
+                    />
+                </View> */}
 
                 <Text style={styles.label}>State</Text>
                 <TextInput
@@ -330,7 +348,7 @@ export default function EditProfilePage({ navigation, route }) {
                             <Ionicons name="add" size={24} color="#0047D2" />
                         </TouchableOpacity>
                     </View>
-                    {educations ? educations.map((education, index) => {
+                    {educations.map((education, index) => {
                         return (
                             <View key={index} style={styles.educationItemBlock}>
                                 <View style={styles.educationItem}>
@@ -346,9 +364,7 @@ export default function EditProfilePage({ navigation, route }) {
                                 </TouchableOpacity>
                             </View>
                         );
-                    }) :
-                        <Text style={{ color: 'gray' }}>No education added</Text>
-                    }
+                    })}
 
                 </View>
 
@@ -364,7 +380,7 @@ export default function EditProfilePage({ navigation, route }) {
                             <Ionicons name="add" size={24} color="#0047D2" />
                         </TouchableOpacity>
                     </View>
-                    {experiences ? experiences.map((experience, index) => {
+                    {experiences.map((experience, index) => {
                         return (
                             <View key={index} style={styles.educationItemBlock}>
                                 <View style={styles.educationItem}>
@@ -382,9 +398,7 @@ export default function EditProfilePage({ navigation, route }) {
                                 </TouchableOpacity>
                             </View>
                         );
-                    }) :
-                        <Text style={{ color: 'gray' }}>No experience added</Text>
-                    }
+                    })}
                 </View>
 
                 <View style={styles.skillsBock}>
@@ -400,7 +414,7 @@ export default function EditProfilePage({ navigation, route }) {
                         </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                        {userSkills ? userSkills.map((skill, index) => (
+                        {userSkills.map((skill, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={[
@@ -411,9 +425,7 @@ export default function EditProfilePage({ navigation, route }) {
                                     {skill}
                                 </Text>
                             </TouchableOpacity>
-                        )) :
-                            <Text style={{ color: 'gray' }}>No skills added</Text>
-                        }
+                        ))}
                     </View>
                 </View>
             </ScrollView>

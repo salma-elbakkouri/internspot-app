@@ -210,7 +210,7 @@ export default function ProfilePage({ navigation, route }) {
             background-color: #f4f4f4;
             color: #0047D2;
             border-radius: 20px;
-            padding: 5px 10px;
+            padding: 20px 10px;
             margin-right: 10px;
             margin-bottom: 10px;
         }
@@ -311,7 +311,7 @@ export default function ProfilePage({ navigation, route }) {
           height: 100%;
         }
         .leftPanel {
-          width: 27%;
+          width: 32%;
           background-color: #484444;
           padding: 0.7cm;
           display: flex;
@@ -319,7 +319,7 @@ export default function ProfilePage({ navigation, route }) {
           align-items: center;
         }
         .rightPanel {
-          width: 73%;
+          width: 68%;
           padding: 0.7cm;
         }        
 
@@ -475,7 +475,9 @@ export default function ProfilePage({ navigation, route }) {
       <page size="A4">
         <div class="container">
           <div class="leftPanel">
-            <img src="avatar.png"/>
+
+            <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}"/>
+
             <div class="details">
               <div class="item bottomLineSeparator">
                 <h2>
@@ -484,82 +486,39 @@ export default function ProfilePage({ navigation, route }) {
                 <div class="smallText">
                   <p>
                     <i class="fa fa-phone contactIcon" aria-hidden="true"></i>
-                    (+33) 777 777 77
+                    ${user.phoneNumber}
                   </p>
                   <p>
                     <i class="fa fa-envelope contactIcon" aria-hidden="true"></i>
-                    <a href="lorem@ipsum.com@gmail.com">
-                      lorem@ipsum.com
+                    <a href="${user.email}">
+                      ${user.email}
                     </a>
                   </p>
                   <p>
                     <i class="fa fa-map-marker contactIcon" aria-hidden="true"></i>
-                    New York, USA
+                    ${user.state}
                   </p>
-                  <p>
-                    <i class="fa fa-linkedin-square contactIcon" aria-hidden="true"></i>
-                    <a href="#">
-                      in/loremipsum
-                    </a>
-                  </p>
-                  <p class="lastParagrafNoMarginBottom">
-                    <i class="fa fa-skype contactIcon" aria-hidden="true"></i>
-                    <a href="#">
-                      loremipsum
-                    </a>
-                  </p>
-                </div>
-              </div>
-              <div class="item bottomLineSeparator">
-                <h2>
-                  SKILLS
-                </h2>
-                <div class="smallText">
-                  <div class="skill">
-                    <div>
-                      <span>Accounting</span>
-                    </div>
-                    <div class="yearsOfExperience">
-                      <span class="alignright">14</span>
-                      <span class="alignleft">years</span>
-                    </div>
-                  </div>
-                  <div class="skill">
-                    <div>
-                      <span>Word</span>
-                    </div>
-                    <div class="yearsOfExperience">
-                      <span class="alignright">3</span>
-                      <span class="alignleft">years</span>
-                    </div>
-                  </div>
-                  <div class="skill">
-                    <div>
-                      <span>Powerpoint</span>
-                    </div>
-                    <div class="yearsOfExperience">
-                      <span class="alignright">1</span>
-                      <span class="alignleft">year</span>
-                    </div>
-                  </div>
+                
                 </div>
               </div>
               <div class="item">
                 <h2>
-                  EDUCATION
+                  SKILLS
                 </h2>
                 <div class="smallText">
-                  <p class="bolded white">
-                    Bachelor of Economics
-                  </p>
-                  <p>
-                    The University of Sydney
-                  </p>
-                  <p>
-                    2010 - 2014
-                  </p>
+
+                ${user.skills.map((skill) => `
+                <div class="skill">
+                    <div>
+                      <span>${skill}</span>
+                    </div>
+                  </div>
+                `).join('')}
+                 
                 </div>
               </div>
+
+
             </div>
           </div>
 
@@ -567,25 +526,12 @@ export default function ProfilePage({ navigation, route }) {
           <div class="rightPanel">
             <div>
               <h1>
-                Jhon Doe
+                ${user.firstName} ${user.lastName}
               </h1>
               <div class="smallText">
                 <h3>
-                  Accountant
+                  Student
                 </h3>
-              </div>
-            </div>
-            <div>
-              <h2>
-                About me
-              </h2>
-              <div class="smallText">
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris venenatis, justo sed feugiat pulvinar., quam ipsum tincidunt enim, ac gravida est metus sit amet neque. Curabitur ut arcu ut nunc finibus accumsan id id elit. 
-                </p>
-                <p>
-                  Vivamus non magna quis neque viverra finibus quis a tortor. 
-                </p>
               </div>
             </div>
 
@@ -594,54 +540,65 @@ export default function ProfilePage({ navigation, route }) {
                 Work experience
               </h2>
               <ul>
-                <li>
-                  <div class="jobPosition">
-                    <span class="bolded">
-                      Accountant
-                    </span>
-                    <span>
-                      Jun 2014 - Sept 2015
-                    </span>
-                  </div>
-                  <div class="projectName bolded">
-                    <span>
-                      Accounting project name | Company name
-                    </span>
-                  </div>
-                </li>
-                <li>
-                  <div class="jobPosition">
-                    <span class="bolded">
-                      Digital Marketing Expert
-                    </span>
-                    <span>
-                      Nov 2020 - Sept 2021
-                    </span>
-                  </div>
-                  <div class="projectName bolded">
-                    <span>
-                      Project name | Company name
-                    </span>
-                  </div> 
-                </li>
-                <li>
-                  <div class="jobPosition">
-                    <span class="bolded">
-                      Accountant
-                    </span>
-                    <span>
-                      Jun 2017 - May 2020
-                    </span>
-                  </div>
-                  <div class="projectName bolded">
-                    <span>
-                    Project name | Company name
-                    </span>
-                  </div>
-                </li>
+                ${user.experiences.map((exp) => `
+                  <li>
+                    <div class="jobPosition">
+                      <span class="bolded">
+                        ${exp.post_title}
+                      </span>
+                      <span>
+                      ${formatDateRange(exp.start_date, exp.end_date)}
+                      </span>
+                    </div>
+                    <div class="projectName bolded">
+                      <span>
+                        ${exp.specialization}, ${exp.location} | ${exp.company}
+                      </span>
+                    </div>
+                    <div>
+                      <p>
+                        ${exp.description}
+                      </p>
+                    </div>
+                  </li>
+                `).join('')}
+                
               </ul>
             </div>
             
+            <div class="workExperience">
+              <h2>
+                Education
+              </h2>
+              <ul>
+
+                ${user.educations.map((edu) => `
+                    <li>
+                      <div class="jobPosition">
+                        <span class="bolded">
+                          ${edu.degree}
+                        </span>
+                        <span>
+                          ${formatDateRange(edu.start_date, edu.end_date)}
+                        </span>
+                      </div>
+                      <div class="projectName bolded">
+                        <span>
+                        ${edu.specialization} | ${edu.school}
+                        </span>
+                      </div>
+                      <div>
+                        <p>
+                          ${edu.description}
+                        </p>
+                      </div>
+                    </li>
+                `).join('')
+        }
+                
+              </ul>
+            </div>
+
           </div>
         </div>
       </page>
