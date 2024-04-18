@@ -46,18 +46,34 @@ export default function ApplicationPage({ navigation }) {
     }
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item, index }) => {
+
+    const imagePaths = [
+      require('../assets/companies/c1.png'),
+      require('../assets/companies/c2.png'),
+      require('../assets/companies/c3.png'),
+      require('../assets/companies/c4.png'),
+      require('../assets/companies/c5.png'),
+      require('../assets/companies/c6.png'),
+      require('../assets/companies/c7.png'),
+      require('../assets/companies/c8.png'),
+      require('../assets/companies/c9.png'),
+      require('../assets/companies/c10.png'),
+    ];
+
+    const image = imagePaths[index % imagePaths.length];
+
     <View style={styles.applicationContainer}>
-      <Image source={require('../assets/companies/c5.png')} style={styles.companyIcon} />
+      <Image source={image} style={styles.companyIcon} />
       <TouchableOpacity onPress={() => navigation1.navigate('ApplicationOfferDetail', { offer: item })}>
         <View style={styles.applicationDetails}>
-          <Text style={styles.applicationTitle}>{item.title}</Text>
+          <Text numberOfLines={2} style={styles.applicationTitle}>{item.title}</Text>
           {/* Change this line to use item.additional_info.Entreprise */}
           <Text style={styles.companyName}>{item.additional_info.Entreprise}</Text>
         </View>
       </TouchableOpacity>
     </View>
-  );
+};
 
 
   return (
@@ -67,7 +83,10 @@ export default function ApplicationPage({ navigation }) {
         <View style={styles.centeredLoader}>
           <ActivityIndicator size="large" color="#0047D2" />
         </View>
-      ) : (
+      ) : 
+      applications.length === 0 ? (
+        <Text style={{ textAlign: 'center' }}>No Applications submitted</Text>
+      )  : (
         <FlatList
           data={applications}
           renderItem={renderItem}
@@ -144,6 +163,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   applicationTitle: {
+    marginRight:20,
     fontSize: 14,
     fontWeight: 'bold',
   },

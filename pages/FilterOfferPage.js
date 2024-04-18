@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     searchInput: {
         width: '100%',
         padding: 10,
+        paddingHorizontal:10,
         backgroundColor: '#f2f2f2',
         borderRadius: 10,
         marginBottom: 20,
@@ -172,8 +173,9 @@ const styles = StyleSheet.create({
     },
     applyButton: {
         backgroundColor: '#0047D2',
-        borderRadius: 20,
+        borderRadius: 35,
         paddingVertical: 15,
+        marginBottom:20,
     },
     applyButtonContainer: {
         zIndex: 999,

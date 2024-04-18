@@ -80,7 +80,7 @@ export default function EditProfilePage({ navigation, route }) {
                     profileImageUrl: imageUrl // Add the image URL to the user document
                 });
 
-                navigation1.goBack();
+
             } catch (error) {
                 console.error('Error updating data: ', error);
                 Alert.alert('Error', 'Failed to update data. Please try again later.');
@@ -259,7 +259,7 @@ export default function EditProfilePage({ navigation, route }) {
             {/* Profile Details */}
             <ImageBackground source={require('../assets/bgimage.png')} style={styles.profileDetails}>
                 <TouchableOpacity style={styles.backButton} onPress={() => {
-                    navigation.goBack();
+                    navigation1.goBack();
                 }}>
                     <FontAwesome name="chevron-left" size={24} color="#fff" />
                 </TouchableOpacity>

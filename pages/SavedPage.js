@@ -183,6 +183,9 @@ export default function SavedPage({ navigation, route }) {
         :
         loading ? (
           <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
+        ) : 
+        offers.length === 0 ? (
+          <Text style={{ textAlign: 'center' }}>No saved offers</Text>
         ) : (
           <FlatList
             data={offers}
@@ -213,8 +216,9 @@ const styles = StyleSheet.create({
   searchInput: {
     width: '100%',
     padding: 10,
+    paddingHorizontal:15,
     backgroundColor: '#f2f2f2',
-    borderRadius: 10,
+    borderRadius: 15,
   },
   filterButton: {
     padding: 8,

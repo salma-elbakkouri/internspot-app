@@ -82,7 +82,7 @@ export default function ProfilePage({ navigation }) {
     const endMonthYear = endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
     return `${startMonthYear} - ${endMonthYear}`;
-};
+  };
 
   const generateAndPrintCV = async () => {
     try {
@@ -90,161 +90,169 @@ export default function ProfilePage({ navigation }) {
       if (!user || !user.firstName || !user.lastName || !user.email || !user.phoneNumber || !user.educations || !user.experiences || !user.skills) {
         // Show alert to complete profile
         Alert.alert(
-            'Complete Your Profile',
-            'Please complete your profile before generating your CV.',
-            [
-                {
-                    text: 'Cancel',
-                    style: 'cancel',
-                },
-                {
-                    text: 'Complete Profile',
-                    onPress: () => {
-                        // Redirect to profile setup page
-                        navigation.navigate('ProfilesetupPage', { user: user, completProfile: true });
-                    },
-                },
-            ],
-            { cancelable: false }
+          'Complete Your Profile',
+          'Please complete your profile before generating your CV.',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Complete Profile',
+              onPress: () => {
+                // Redirect to profile setup page
+                navigation.navigate('ProfilesetupPage', { user: user, completProfile: true });
+              },
+            },
+          ],
+          { cancelable: false }
         );
         return; // Stop execution if user data is incomplete
-    }
+      }
 
-    // Generate HTML content for the CV
+      // Generate HTML content for the CV
       const htmlContent = `
       <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Resume</title>
-          <style>
-              * {
-                  box-sizing: border-box;
-                  margin: 0;
-                  padding: 0;
-              }
-      
-              body {
-                  font-family: Arial, sans-serif;
-                  line-height: 1.6;
-              }
-      
-              h1, h2, h3, h4, h5, h6 {
-                  line-height: 1.2;
-              }
-      
-              p {
-                  margin-bottom: 10px;
-              }
-      
-              .container {
-                  max-width: 800px;
-                  margin: 0 auto;
-                  overflow: hidden;
-              }
-      
-              .header {
-                  background-color: #f4f4f4;
-                  padding: 20px;
-                  text-align: center;
-              }
-      
-              .header img {
-                  width: 150px;
-                  height: 150px;
-                  border-radius: 50%;
-                  object-fit: cover;
-              }
-      
-              .main-content {
-                  padding: 20px;
-              }
-      
-              .section {
-                  margin-bottom: 30px;
-              }
-      
-              .section-title {
-                  font-size: 1.5em;
-                  margin-bottom: 10px;
-              }
-      
-              .section-title::after {
-                  content: '';
-                  display: block;
-                  width: 50px;
-                  height: 3px;
-                  background-color: #333;
-                  margin: 10px auto;
-              }
-      
-              .section-content {
-                  margin-left: 1em;
-              }
-      
-              @media screen and (max-width: 768px) {
-                  .header img {
-                      width: 100px;
-                      height: 100px;
-                  }
-              }
-          </style>
-      </head>
-      <body>
-      
-      <div class="container">
-          <div class="header">
-              <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}" alt="Profile Picture">
-              <h1>${user.firstName} ${user.lastName}</h1>
-              <p>Student</p>
-              <p>Email: ${user.email} | Phone: ${user.phoneNumber}</p>
-          </div>
-      
-          <div class="main-content">
-      
-              <div class="section" id="education">
-                  <h2 class="section-title">Education</h2>
-                  ${
-                    user.educations.map((edu) => `
-                      <div class="section-content">
-                          <p><strong>${edu.degree}</strong>,</p>
-                          <p><strong>${edu.school}</strong>, ${formatDateRange(edu.start_date, edu.end_date)}</p>
-                          <p>${edu.description}</p>
-                      </div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .header img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #0047D2;
+        }
+
+        .section-content {
+            margin-left: 20px;
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .skill {
+            background-color: #f4f4f4;
+            color: #0047D2;
+            border-radius: 20px;
+            padding: 5px 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .header img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}" alt="Profile Picture">
+        <h1>${user.firstName} ${user.lastName}</h1>
+        <p>Student</p>
+        <p>Email: ${user.email} </p> <p>Phone: ${user.phoneNumber}</p>
+    </div>
+
+    <div class="main-content">
+
+        <div class="section" id="education">
+            <h2 class="section-title">Education</h2>
+            ${user.educations.map((edu) => `
+                    <div class="section-content">
+                        <h3>${edu.degree}</h3>
+                        <p><strong>${edu.school}</strong>, ${formatDateRange(edu.start_date, edu.end_date)}</p>
+                        <p>${edu.description}</p>
+                    </div>
+                `).join('')
+        }
+        </div>
+
+        <div class="section" id="experience">
+            <h2 class="section-title">Work Experience</h2>
+            ${user.experiences.map((exp) => `
+                    <div class="section-content">
+                        <h3>${exp.post_title}</h3>
+                        <p><strong>${exp.company}</strong>, ${exp.specialization}, ${exp.location}, ${formatDateRange(exp.start_date, exp.end_date)}</p>
+                        <p>${exp.description}</p>
+                    </div>
+                `).join('')
+        }
+        </div>
+
+        <div class="section" id="skills">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-container">
+                ${user.skills.map((skill) => `
+                        <span class="skill">${skill}</span>
                     `).join('')
-                  }
-              </div>
-      
-              <div class="section" id="experience">
-                  <h2 class="section-title">Work Experience</h2>
-                  ${
-                    user.experiences.map((exp) => `
-                      <div class="section-content">
-                          <p><strong>${exp.post_title}</strong></p>
-                          <p><strong>${exp.company}</strong>, ${exp.specialization}, ${exp.location}, ${formatDateRange(exp.start_date, exp.end_date)}</p>
-                          <p>${exp.description}</p>
-                      </div>
-                    `).join('')
-                  }
-              </div>
-      
-              <div class="section" id="skills">
-                  <h2 class="section-title">Skills</h2>
-                  <div class="section-content">
-                    ${
-                      user.skills.map((skill) => `
-                        <span style="padding: 5px 10px; background-color: #f4f4f4; border-radius: 5px; margin-right: 10px; margin-top: 6px;">${skill}</span>
-                      `).join('')
-                    }
-                  </div>
-              </div>
-      
-          </div>
-      </div>
-      
-      </body>
-      </html>
+        }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
       `;
 
       // Generate PDF from HTML
@@ -291,7 +299,7 @@ export default function ProfilePage({ navigation }) {
         </TouchableOpacity>
         <View style={styles.profileImageContainer}>
           <Image
-            source={user.profileImageUrl ? { uri: user.profileImageUrl } : require('../assets/img-placeholder.png')}
+            source={user.profileImageUrl ? { uri: user.profileImageUrl } : require('../assets/profilepic.png')}
             style={styles.profileImage}
           />
         </View>
@@ -362,18 +370,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignSelf: 'flex-end',
     padding: 10,
-    paddingHorizontal: 25,
+    paddingHorizontal: 15,
     borderRadius: 5,
     marginRight: 20,
     marginTop: 15,
   },
   downloadCvButton: {
-    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     flexDirection: 'row',
     padding: 10,
     paddingHorizontal: 25,
     borderRadius: 5,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   editProfileButtonText: {
     color: 'white',

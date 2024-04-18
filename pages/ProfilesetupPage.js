@@ -114,7 +114,7 @@ export default function ProfilesetupPage({ route }) {
                 </View>
 
 
-                <Text style={styles.label}>State</Text>
+                <Text style={styles.label}>City</Text>
                 <TextInput
                     style={styles.input}
                     onChangeText={setState}

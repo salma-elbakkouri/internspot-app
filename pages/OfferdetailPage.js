@@ -12,6 +12,7 @@ const OfferdetailsPage = ({ route, navigation }) => {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [applied, setApplied] = React.useState(false);
     const [user, setUser] = useState(null);
+    const [expanded, setExpanded] = useState(false);
     
 
     useFocusEffect(
@@ -171,6 +172,10 @@ const OfferdetailsPage = ({ route, navigation }) => {
         timeAgo = `${secondsDifference} second${secondsDifference > 1 ? 's' : ''} ago`;
     }
 
+    const truncatedDescription = expanded ? offer.description : offer.description.slice(0, 280) + '...';
+    const toggleExpanded = () => setExpanded(!expanded); // Function to toggle expanded state
+
+
     return (
         <View style={styles.container}>
             {/* Back button */}
@@ -186,7 +191,7 @@ const OfferdetailsPage = ({ route, navigation }) => {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {/* Offer picture */}
                 <Image
-                    source={require('../assets/companies/c5.png')}
+                    source={require('../assets/offerimg.jpg')}
                     style={styles.offerPicture}
                     resizeMode="contain"
                 />
@@ -212,7 +217,9 @@ const OfferdetailsPage = ({ route, navigation }) => {
                     </View>
 
                     <Text style={styles.sectionTitle}>Description</Text>
-                    <Text style={styles.description}>{offer.description}</Text>
+                    <TouchableOpacity onPress={toggleExpanded}>
+                        <Text style={styles.description}>{truncatedDescription} {expanded ? 'See less' : 'See more'}</Text>
+                    </TouchableOpacity>
 
                 </View>
             </ScrollView>
