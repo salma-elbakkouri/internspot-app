@@ -241,8 +241,7 @@ export default function Home({ navigation, route }) {
     navigation1.navigate('FilterOptionsPage');
   }
 
-  const renderItem = ({ item }) => {
-    const index = data.indexOf(item);
+  const renderItem = ({ item, index }) => {
     const key = item.id + '-' + index;
 
 
