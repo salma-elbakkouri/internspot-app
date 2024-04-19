@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        marginTop: 20,
+        marginTop: 'auto',
         borderRadius: 30,
     },
     nextButtonText: {
