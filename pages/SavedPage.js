@@ -182,29 +182,38 @@ export default function SavedPage({ navigation, route }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.recentOffersText}>Saved Offers</Text>
-      {!isUserLoggedIn ?
-        <Text style={{ textAlign: 'center' }}>No saved offers</Text>
-        :
-        loading ? (
-          <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
-        ) : 
-        offers.length === 0 ? (
-          <Text style={styles.centeredLoader}>No saved offers</Text>
-        ) : (
-          <FlatList
-            data={offers}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={{ paddingBottom: 60 }}
-          />
-        )
-      }
-
-      {/* Bottom tab bar with navigation prop */}
-      <BottomTabBar navigation={navigation} />
+<View style={styles.container}>
+  <Text style={styles.recentOffersText}>Saved Offers</Text>
+  {!isUserLoggedIn ? (
+    <View style={styles.noOffersContainer}>
+      <Image source={require('../assets/not_found.jpg')} style={styles.notFoundImage} />
+      <Text style={styles.noOffersText}>No saved offers</Text>
+      <Text style={styles.noOffersDetailText}>
+        You have no saved offers right now. Go to the offers page and save a new offer!
+      </Text>
     </View>
+  ) : loading ? (
+    <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
+  ) : offers.length === 0 ? (
+    <View style={styles.noOffersContainer}>
+      <Image source={require('../assets/not_found.jpg')} style={styles.notFoundImage} />
+      <Text style={styles.noOffersText}>No saved offers</Text>
+      <Text style={styles.noOffersDetailText}>
+        You have no saved offers right now. Go to the offers page and save a new offer!
+      </Text>
+    </View>
+  ) : (
+    <FlatList
+      data={offers}
+      renderItem={renderItem}
+      keyExtractor={item => item.id}
+      contentContainerStyle={{ paddingBottom: 60 }}
+    />
+  )}
+
+  {/* Bottom tab bar with navigation prop */}
+  <BottomTabBar navigation={navigation} />
+</View>
   );
 }
 
@@ -324,5 +333,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center',
     textAlign:'center', 
+  },
+  noOffersContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  notFoundImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+  },
+  noOffersText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  noOffersDetailText: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: 'grey',
+    marginTop: 10,
+  },
+  loadingSpin: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -82,9 +82,13 @@ export default function ApplicationPage({ navigation }) {
           <ActivityIndicator size="large" color="#0047D2" />
         </View>
       )  : applications.length === 0 ? (
-        <View style={styles.centeredLoader}>
-          <Text>No applications found</Text>
-        </View>
+        <View style={styles.noOffersContainer}>
+      <Image source={require('../assets/not_found.jpg')} style={styles.notFoundImage} />
+      <Text style={styles.noOffersText}>No applications found</Text>
+      <Text style={styles.noOffersDetailText}>
+        You have no applications right now. Go to the offers page and apply for a new offer!
+      </Text>
+    </View>
       ) :  (
         <FlatList
           data={applications}
@@ -187,6 +191,33 @@ const styles = StyleSheet.create({
     flex: 1, // Takes full height of the container
     justifyContent: 'center', // Center vertically
     alignItems: 'center' // Center horizontally
+  },
+  noOffersContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  notFoundImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+  },
+  noOffersText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  noOffersDetailText: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: 'grey',
+    marginTop: 10,
+  },
+  loadingSpin: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   
 });
