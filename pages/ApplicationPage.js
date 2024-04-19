@@ -183,4 +183,10 @@ const styles = StyleSheet.create({
     height: 32,
     marginTop: 15,
   },
+  centeredLoader: {
+    flex: 1, // Takes full height of the container
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center' // Center horizontally
+  },
+  
 });
