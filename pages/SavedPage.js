@@ -104,8 +104,7 @@ export default function SavedPage({ navigation, route }) {
   }
   
 
-  const renderItem = ({ item }) => {
-    const index = offers.indexOf(item);
+  const renderItem = ({ item, index }) => {
     const key = item.id + '-' + index;
 
     const imagePaths = [
@@ -184,18 +183,6 @@ export default function SavedPage({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      {/* Search input and filter button */}
-      <View style={styles.searchContainer}>
-        <TextInput onPressIn={filterPageNavigate}
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="lightgray"
-        />
-        {/* <TouchableOpacity onPress={navigateToFilterPage} style={styles.filterButton}>
-          <Image source={require('../assets/filtericon.png')} tintColor={'white'} style={styles.filterIcon} />
-        </TouchableOpacity> */}
-      </View>
-      {/* Recent offers text */}
       <Text style={styles.recentOffersText}>Saved Offers</Text>
       {!isUserLoggedIn ?
         <Text style={{ textAlign: 'center' }}>No saved offers</Text>
@@ -204,7 +191,7 @@ export default function SavedPage({ navigation, route }) {
           <ActivityIndicator size="large" color="#0047D2" style={[styles.loadingSpin]} />
         ) : 
         offers.length === 0 ? (
-          <Text style={{ textAlign: 'center' }}>No saved offers</Text>
+          <Text style={styles.centeredLoader}>No saved offers</Text>
         ) : (
           <FlatList
             data={offers}
@@ -252,7 +239,7 @@ const styles = StyleSheet.create({
   recentOffersText: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 30,
+    marginTop: 60,
     marginBottom: 12,
     marginLeft: 10,
     color: 'black',
@@ -331,5 +318,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
+  centeredLoader: {
+    flex: 1,
+    justifyContent: 'center', 
+    alignItems: 'center',
+    textAlign:'center', 
+  },
 });

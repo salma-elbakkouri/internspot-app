@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity , ScrollView } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
@@ -88,6 +88,7 @@ export default function AddExperiencePage({route}) {
     };
 
     return (
+        <ScrollView style={styles.scrollViewStyle}>
         <View style={styles.container}>
             <View style={styles.form}>
                 <Text style={styles.label}>Company</Text>
@@ -166,10 +167,15 @@ export default function AddExperiencePage({route}) {
                 </View>
             </View>
         </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    scrollViewStyle: {
+        flex: 1,
+        backgroundColor: 'white',  // Match the background color for consistency
+    },
     container: {
         flex: 1,
         paddingHorizontal: 20,

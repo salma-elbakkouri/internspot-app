@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform , ScrollView} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
@@ -65,6 +65,7 @@ export default function ProfilesetupPage({ route }) {
     };
 
     return (
+        <ScrollView style={styles.scrollViewStyle}>
         <View style={styles.container}>
             <Text style={styles.title}>Let's start creating your profile!</Text>
 
@@ -98,6 +99,7 @@ export default function ProfilesetupPage({ route }) {
                     required
                     value={phoneNumber}
                 />
+                
 
                 <Text style={styles.label}>Date of birth</Text>
                 <View style={styles.datePickerContainer}>
@@ -138,10 +140,15 @@ export default function ProfilesetupPage({ route }) {
             ) : null
         }
         </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    scrollViewStyle: {
+        flex: 1,
+        backgroundColor: 'white',  // Match the background color for consistency
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -152,8 +159,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#000',
-        marginTop: 120,
         marginBottom: 20,
+        marginTop:60,
     },
     formContainer: {
         width: '100%',
@@ -177,7 +184,8 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        marginTop: 'auto',
+        marginTop: '30',
+        marginBottom:20,
         borderRadius: 30,
     },
     nextButtonText: {

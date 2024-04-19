@@ -13,7 +13,7 @@ const OfferdetailsPage = ({ route, navigation }) => {
     const [applied, setApplied] = React.useState(false);
     const [user, setUser] = useState(null);
     const [expanded, setExpanded] = useState(false);
-    
+
 
     useFocusEffect(
         React.useCallback(() => {
@@ -128,17 +128,17 @@ const OfferdetailsPage = ({ route, navigation }) => {
             const userData = querySnapshot.docs[0].data();
             const appliedOffers = userData.appliedOffers || [];
             const docRef = querySnapshot.docs[0].ref;
-    
+
             // Check if the offer ID already exists in the appliedOffers array
             if (!appliedOffers.includes(offer.id)) {
                 // If the offer ID is not already in the array, push it
                 appliedOffers.push(offer.id);
-    
+
                 // Update the document with the updated appliedOffers array
                 await updateDoc(docRef, {
                     appliedOffers: appliedOffers,
                 });
-    
+
                 setApplied(false);
             } else {
                 // If the offer ID already exists, you can handle it here (maybe show a message or perform some other action)
@@ -201,7 +201,7 @@ const OfferdetailsPage = ({ route, navigation }) => {
                 <Text style={styles.location}>{offer.general_info.City}</Text>
                 <Text style={styles.offerTitle}>{offer.title}</Text>
 
-                
+
 
                 {/* More details */}
                 <View style={styles.moreDetails}>
@@ -218,7 +218,13 @@ const OfferdetailsPage = ({ route, navigation }) => {
 
                     <Text style={styles.sectionTitle}>Description</Text>
                     <TouchableOpacity onPress={toggleExpanded}>
-                        <Text style={styles.description}>{truncatedDescription} {expanded ? 'See less' : 'See more'}</Text>
+                        <Text style={styles.description}>
+                            {truncatedDescription}{' '}
+                            <Text style={styles.seeMoreLess}>
+                                {expanded ? 'See less' : 'See more'}
+                            </Text>
+                        </Text>
+
                     </TouchableOpacity>
 
                 </View>
@@ -274,7 +280,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     location: {
-        fontSize:14,
+        fontSize: 14,
         textAlign: 'center',
         color: '#666',
     },
@@ -371,6 +377,9 @@ const styles = StyleSheet.create({
     appliedBlockBtn: {
         marginHorizontal: 5,
     },
+    seeMoreLess: {
+        color: 'gray',  // This sets the text color to gray
+      },
 });
 
 export default OfferdetailsPage;

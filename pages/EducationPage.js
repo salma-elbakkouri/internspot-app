@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList , ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
 import { db } from '../config/firebase';
@@ -66,6 +66,7 @@ export default function EducationPage({ route }) {
     };
 
     return (
+        <ScrollView style={styles.scrollViewStyle}>
         <View style={styles.container}>
             <Text style={styles.title}>Education</Text>
             <TouchableOpacity style={styles.addButton} onPress={navigateToAddEducationPage}>
@@ -95,10 +96,15 @@ export default function EducationPage({ route }) {
                 </TouchableOpacity>
             </View>
         </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    scrollViewStyle: {
+        flex: 1,
+        backgroundColor: 'white',  // Match the background color for consistency
+    },
     container: {
         flex: 1,
         paddingHorizontal: 20,
