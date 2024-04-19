@@ -745,6 +745,8 @@ export default function ProfilePage({ navigation, route }) {
         <MenuItem icon="headset" text="Support" />
         <MenuItem icon="shield-alt" text="Privacy Policy" />
         <MenuItem icon="question" text="FAQ" />
+        <MenuItem icon="question" text="FAQ" />
+        <MenuItem icon="question" text="FAQ" />
         {isUserLoggedIn ? <MenuItem icon="sign-out-alt" text="Logout" onPress={handleLogout} /> : null}
       </View>
      </ScrollView>
