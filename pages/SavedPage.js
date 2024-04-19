@@ -185,16 +185,7 @@ export default function SavedPage({ navigation, route }) {
   return (
     <View style={styles.container}>
       {/* Search input and filter button */}
-      <View style={styles.searchContainer}>
-        <TextInput onPressIn={filterPageNavigate}
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="lightgray"
-        />
-        {/* <TouchableOpacity onPress={navigateToFilterPage} style={styles.filterButton}>
-          <Image source={require('../assets/filtericon.png')} tintColor={'white'} style={styles.filterIcon} />
-        </TouchableOpacity> */}
-      </View>
+      
       {/* Recent offers text */}
       <Text style={styles.recentOffersText}>Saved Offers</Text>
       {!isUserLoggedIn ?
