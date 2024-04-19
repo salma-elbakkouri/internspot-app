@@ -81,7 +81,11 @@ export default function ApplicationPage({ navigation }) {
         <View style={styles.centeredLoader}>
           <ActivityIndicator size="large" color="#0047D2" />
         </View>
-      ) : (
+      )  : applications.length === 0 ? (
+        <View style={styles.centeredLoader}>
+          <Text>No applications found</Text>
+        </View>
+      ) :  (
         <FlatList
           data={applications}
           renderItem={renderItem}
