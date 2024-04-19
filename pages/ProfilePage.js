@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image, Alert, ScrollView } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import BottomTabBar from '../components/BottomTabBar';
 import { useNavigation } from '@react-navigation/native';
@@ -731,6 +731,7 @@ export default function ProfilePage({ navigation, route }) {
   };
 
   return (
+    
     <View style={styles.container}>
       {/* Profile Details */}
       <ImageBackground source={require('../assets/bgimage.png')} style={styles.profileDetails}>
@@ -738,6 +739,7 @@ export default function ProfilePage({ navigation, route }) {
       </ImageBackground>
 
       {/* Menu for Settings */}
+      <ScrollView style={styles.scrollViewStyle}>
       <View style={styles.settingsMenu}>
         <MenuItem icon="globe" text="Language" />
         <MenuItem icon="headset" text="Support" />
@@ -745,10 +747,11 @@ export default function ProfilePage({ navigation, route }) {
         <MenuItem icon="question" text="FAQ" />
         {isUserLoggedIn ? <MenuItem icon="sign-out-alt" text="Logout" onPress={handleLogout} /> : null}
       </View>
-
+     </ScrollView>
       {/* Bottom tab bar with navigation prop */}
       <BottomTabBar navigation={navigation} state={{ routeNames: ['Home', 'Saved', 'Application', 'Notification', 'Profile'], index: 4 }} />
     </View>
+    
   );
 }
 
@@ -835,4 +838,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 200,
   },
+  scrollViewStyle: {
+    flex: 1,
+    backgroundColor: 'white',  
+},
 });
