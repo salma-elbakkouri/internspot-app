@@ -56,7 +56,7 @@ export default function ProfilePage({ navigation, route }) {
   }, [navigation1]);
 
   const handleLogout = async () => {
-    // Show confirmation alert
+    // Show confirmation alert 
     Alert.alert(
       'Logout',
       'Are you sure you want to log out?',
