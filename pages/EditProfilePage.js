@@ -277,7 +277,6 @@ export default function EditProfilePage({ navigation, route }) {
                 {/* Save button */}
                 <TouchableOpacity style={styles.saveButton} onPress={handelSave}>
                     <Text style={styles.editProfileButtonText}>Save</Text>
-                    <FontAwesome name="bookmark" size={22} color="#fff" />
                 </TouchableOpacity>
             </ImageBackground>
             <ScrollView style={styles.formContainer}>

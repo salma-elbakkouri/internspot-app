@@ -134,6 +134,359 @@ export default function ProfilePage({ navigation, route }) {
       // Generate HTML content for the CV
       const resumeModel2 = `
       <!DOCTYPE html>
+<html>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow&family=Julius+Sans+One&family=Open+Sans&family=Source+Sans+Pro&display=swap" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: rgb(204,204,204); 
+      width: 21cm;
+      height: 29.7cm;
+      margin: 0 auto;
+    }
+
+    page {
+      background: white;
+      display: block;
+      margin: 0 auto;
+      margin-bottom: 0.5cm;
+      position: relative;
+    }
+
+    page[size="A4"] {
+      width: 21cm;
+      height: 29.7cm;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: 100%;
+    }
+
+    .leftPanel {
+      width: 32%;
+      background-color: #484444;
+      padding: 0.7cm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .rightPanel {
+      width: 68%;
+      padding: 0.7cm;
+    }
+
+    .item {
+      padding-bottom: 0.7cm;
+      padding-top: 0.7cm;
+    }
+
+    .bottomLineSeparator {
+      border-bottom: 0.05cm solid white;
+    }
+
+    .skillsList {
+      padding-left: 0.7cm; /* Style for bullet points */
+      list-style-type: disc; /* Bullet points */
+    }
+
+    .workExperience, .education {
+      margin-top: 1cm; /* Added top margin */
+      border-top: 2px solid #ccc; /* Separator line */
+      padding-top: 0.5cm;
+    }
+
+    img {
+      width: 4cm;
+      height: 4cm;
+      margin-bottom: 0.7cm;
+      border-radius: 50%;
+      border: 0.15cm solid white;
+      object-fit: cover;
+      object-position: 50% 50%;
+    }
+
+    .contactIcon {
+      width: 0.5cm;
+      text-align: center;
+    }
+
+    .leftPanel, .leftPanel a {
+      color: #bebebe;
+      text-decoration: none;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Julius Sans One', sans-serif;
+      transform: scale(1,1.15);
+      text-transform: uppercase;
+    }
+
+    .jobPosition, .projectName {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    @page {
+      size: 21cm 29.7cm;
+      margin: 0mm;
+    }
+  </style>
+</head>
+<body>
+  <page size="A4">
+    <div class="container">
+      <div class="leftPanel">
+        <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}"/>
+        <div class="details">
+          <div class="item bottomLineSeparator">
+            <h2>CONTACT</h2>
+            <div class="smallText">
+              <p><i class="fa fa-phone contactIcon"></i>${user.phoneNumber}</p>
+              <p><i class="fa fa-envelope contactIcon"></i><a href="${user.email}" style="font-size: 12px;">${user.email}</a></p>
+              <p><i class="fa fa-map-marker contactIcon"></i>${user.state}</p>
+            </div>
+          </div>
+          <div class="item">
+            <h2>SKILLS</h2>
+            <ul class="skillsList">
+              ${user.skills.map(skill => `<li>${skill}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="rightPanel">
+        <h1>${user.firstName} ${user.lastName}</h1>
+        <div class="smallText"><h3>Student</h3></div>
+        <div class="workExperience">
+          <h2>Work experience</h2>
+          <ul>
+            ${user.experiences.map(exp => `
+              <li>
+                <div class="jobPosition">
+                  <span class="bolded">${exp.post_title}</span>
+                  <span>${formatDateRange(exp.start_date, exp.end_date)}</span>
+                </div>
+                <div class="projectName bolded">
+                  <span>${exp.specialization}, ${exp.location} | ${exp.company}</span>
+                </div>
+                <div><p>${exp.description}</p></div>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+
+        <div class="education">
+          <h2>Education</h2>
+          <ul>
+            ${user.educations.map(edu => `
+              <li>
+                <div class="jobPosition">
+                  <span class="bolded">${edu.degree}</span>
+                  <span>${formatDateRange(edu.start_date, edu.end_date)}</span>
+                </div>
+                <div class="projectName bolded">
+                  <span>${edu.specialization} | ${edu.school}</span>
+                </div>
+                <div><p>${edu.description}</p></div>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </page>
+</body>
+</html>
+      `;
+      const resumeModel3 = `
+      <!DOCTYPE html>
+<html>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow&family=Julius+Sans+One&family=Open+Sans&family=Source+Sans+Pro&display=swap" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: rgb(204,204,204); 
+      width: 21cm;
+      height: 29.7cm;
+      margin: 0 auto;
+    }
+
+    page {
+      background: white;
+      display: block;
+      margin: 0 auto;
+      margin-bottom: 0.5cm;
+      position: relative;
+    }
+
+    page[size="A4"] {
+      width: 21cm;
+      height: 29.7cm;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: 100%;
+    }
+
+    .leftPanel {
+      width: 32%;
+      background-color: #1D2F9E;
+      padding: 0.7cm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .rightPanel {
+      width: 68%;
+      padding: 0.7cm;
+    }
+
+    .item {
+      padding-bottom: 0.7cm;
+      padding-top: 0.7cm;
+    }
+
+    .bottomLineSeparator {
+      border-bottom: 0.05cm solid white;
+    }
+
+    .skillsList {
+      padding-left: 0.7cm; /* Style for bullet points */
+      list-style-type: disc; /* Bullet points */
+    }
+
+    .workExperience, .education {
+      margin-top: 1cm; /* Added top margin */
+      border-top: 2px solid #ccc; /* Separator line */
+      padding-top: 0.5cm;
+    }
+
+    img {
+      width: 4cm;
+      height: 4cm;
+      margin-bottom: 0.7cm;
+      border-radius: 50%;
+      border: 0.15cm solid white;
+      object-fit: cover;
+      object-position: 50% 50%;
+    }
+
+    .contactIcon {
+      width: 0.5cm;
+      text-align: center;
+    }
+
+    .leftPanel, .leftPanel a {
+      color: #bebebe;
+      text-decoration: none;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Julius Sans One', sans-serif;
+      transform: scale(1,1.15);
+      text-transform: uppercase;
+    }
+
+    .jobPosition, .projectName {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    @page {
+      size: 21cm 29.7cm;
+      margin: 0mm;
+    }
+  </style>
+</head>
+<body>
+  <page size="A4">
+    <div class="container">
+      <div class="leftPanel">
+        <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}"/>
+        <div class="details">
+          <div class="item bottomLineSeparator">
+            <h2>CONTACT</h2>
+            <div class="smallText">
+              <p><i class="fa fa-phone contactIcon"></i>${user.phoneNumber}</p>
+              <p><i class="fa fa-envelope contactIcon"></i><a href="${user.email}" style="font-size: 12px;">${user.email}</a></p>
+              <p><i class="fa fa-map-marker contactIcon"></i>${user.state}</p>
+            </div>
+          </div>
+          <div class="item">
+            <h2>SKILLS</h2>
+            <ul class="skillsList">
+              ${user.skills.map(skill => `<li>${skill}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="rightPanel">
+        <h1>${user.firstName} ${user.lastName}</h1>
+        <div class="smallText"><h3>Student</h3></div>
+        <div class="workExperience">
+          <h2>Work experience</h2>
+          <ul>
+            ${user.experiences.map(exp => `
+              <li>
+                <div class="jobPosition">
+                  <span class="bolded">${exp.post_title}</span>
+                  <span>${formatDateRange(exp.start_date, exp.end_date)}</span>
+                </div>
+                <div class="projectName bolded">
+                  <span>${exp.specialization}, ${exp.location} | ${exp.company}</span>
+                </div>
+                <div><p>${exp.description}</p></div>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+
+        <div class="education">
+          <h2>Education</h2>
+          <ul>
+            ${user.educations.map(edu => `
+              <li>
+                <div class="jobPosition">
+                  <span class="bolded">${edu.degree}</span>
+                  <span>${formatDateRange(edu.start_date, edu.end_date)}</span>
+                </div>
+                <div class="projectName bolded">
+                  <span>${edu.specialization} | ${edu.school}</span>
+                </div>
+                <div><p>${edu.description}</p></div>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </page>
+</body>
+</html>
+      `;
+
+      const resumeModel1 = `
+      <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -210,9 +563,8 @@ export default function ProfilePage({ navigation, route }) {
             background-color: #f4f4f4;
             color: #0047D2;
             border-radius: 20px;
-            padding: 20px 10px;
+            padding: 10px 15px;
             margin-right: 10px;
-            margin-bottom: 10px;
         }
 
         @media screen and (max-width: 768px) {
@@ -274,362 +626,35 @@ export default function ProfilePage({ navigation, route }) {
 </html>
       `;
 
-      const resumeModel1 = `
-      <!DOCTYPE html>
-<html>
-   <head>
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow&family=Julius+Sans+One&family=Open+Sans&family=Source+Sans+Pro&display=swap" rel="stylesheet">
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-
-      <style>
-        body {
-          background: rgb(204,204,204); 
-          width: 21cm;
-          height: 29.7cm;
-          margin: 0 auto;
-        }
-
-        page {
-          background: white;
-          display: block;
-          margin: 0 auto;
-          margin-bottom: 0.5cm;
-          position: relative;
-        }
-
-        page[size="A4"] {  
-          width: 21cm;
-          height: 29.7cm; 
-        }
-
-        .container {
-          display: flex;
-          flex-direction: row;
-          width: 100%;
-          height: 100%;
-        }
-        .leftPanel {
-          width: 32%;
-          background-color: #484444;
-          padding: 0.7cm;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .rightPanel {
-          width: 68%;
-          padding: 0.7cm;
-        }        
-
-        .item {
-          padding-bottom: 0.7cm;
-          padding-top: 0.7cm;
-        }
-        .item h2{
-          margin-top: 0;
-        }
-        .bottomLineSeparator {
-          border-bottom: 0.05cm solid white;
-        }
-        h2 {
-          font-family: 'Archivo Narrow', sans-serif;
-        }
-        .leftPanel h2 {
-          color: white;
-        }
-        img {
-          width: 4cm;
-          height: 4cm;
-          margin-bottom: 0.7cm;
-          border-radius: 50%;
-          border: 0.15cm solid white;
-          object-fit: cover;
-          object-position: 50% 50%;
-        }
-        .details {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .leftPanel .smallText, 
-        .leftPanel .smallText, 
-        .leftPanel .smallText span, 
-        .leftPanel .smallText p, 
-        .smallText a {
-          font-size: 0.45cm;
-        }
-        .smallText, 
-        .smallText span, 
-        .smallText p, 
-        .smallText a {
-          font-family: 'Source Sans Pro', sans-serif;
-          text-align: justify;
-        }
-        .contactIcon {
-          width: 0.5cm;
-          text-align: center;
-        }
-        .leftPanel, 
-        .leftPanel a {
-          color: #bebebe;
-          text-decoration: none;
-        }
-
-        .skill {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-        }
-        .yearsOfExperience {
-          width: 1.6cm;
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-        }
-        .alignleft {
-          text-align: left !important;
-          width: 1cm;
-        }
-        .alignright {
-          text-align: right !important;
-          width: 0.6cm;
-          margin-right: 0.1cm
-        }
-
-        .bolded {
-          font-weight: bold;
-        }
-        .white {
-          color: white;
-        }
-
-        h1 { 
-          font-family: 'Julius Sans One', sans-serif;
-        }
-        h1 { 
-          font-weight: 300; 
-          font-size: 1.2cm;
-          transform:scale(1,1.15); 
-          margin-bottom: 0.2cm;
-          margin-top: 0.2cm;
-          text-transform: uppercase; 
-        }
-        h3 {
-          font-family: 'Open Sans', sans-serif;
-        }
-
-        .workExperience>ul>li ul {
-          padding-left: 0.5cm;
-          list-style-type: disc;
-        }
-        .workExperience>ul {
-          list-style-type: none;
-          padding-left: 0;
-        }
-        .workExperience>ul>li {
-          position: relative;
-          margin: 0;
-          padding-bottom: 0.5cm;
-          padding-left: 0.5cm;
-        }
-        .workExperience>ul>li:before {
-          background-color: #b8abab;
-          width: 0.05cm;
-          content: '';
-          position: absolute;
-          top: 0.1cm;
-          bottom: -0.2cm; /* change this after border removal */
-          left: 0.05cm;
-        }
-        .workExperience>ul>li::after {
-          content: '';
-          position: absolute;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' aria-hidden='true' viewBox='0 0 32 32' focusable='false'%3E%3Ccircle stroke='none' fill='%23484444' cx='16' cy='16' r='10'%3E%3C/circle%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-size: contain;
-          left: -0.09cm;
-          top: 0;
-          width: 0.35cm;
-          height: 0.35cm;
-        }
-        .jobPosition {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-        }
-        .jobPosition span, 
-        .projectName span {
-          font-family: 'Source Sans Pro', sans-serif;
-        }
-
-        @page {
-          size: 21cm 29.7cm;
-          margin: 0mm;
-        }
-      </style>
-   </head>
-   <body>
-      <page size="A4">
-        <div class="container">
-          <div class="leftPanel">
-
-            <img src="${user.profileImageUrl ?? 'https://cdn.icon-icons.com/icons2/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png'}"/>
-
-            <div class="details">
-              <div class="item bottomLineSeparator">
-                <h2>
-                  CONTACT
-                </h2>
-                <div class="smallText">
-                  <p>
-                    <i class="fa fa-phone contactIcon" aria-hidden="true"></i>
-                    ${user.phoneNumber}
-                  </p>
-                  <p>
-                    <i class="fa fa-envelope contactIcon" aria-hidden="true"></i>
-                    <a href="${user.email}">
-                      ${user.email}
-                    </a>
-                  </p>
-                  <p>
-                    <i class="fa fa-map-marker contactIcon" aria-hidden="true"></i>
-                    ${user.state}
-                  </p>
-                
-                </div>
-              </div>
-              <div class="item">
-                <h2>
-                  SKILLS
-                </h2>
-                <div class="smallText">
-
-                ${user.skills.map((skill) => `
-                <div class="skill">
-                    <div>
-                      <span>${skill}</span>
-                    </div>
-                  </div>
-                `).join('')}
-                 
-                </div>
-              </div>
-
-
-            </div>
-          </div>
-
-
-          <div class="rightPanel">
-            <div>
-              <h1>
-                ${user.firstName} ${user.lastName}
-              </h1>
-              <div class="smallText">
-                <h3>
-                  Student
-                </h3>
-              </div>
-            </div>
-
-            <div class="workExperience">
-              <h2>
-                Work experience
-              </h2>
-              <ul>
-                ${user.experiences.map((exp) => `
-                  <li>
-                    <div class="jobPosition">
-                      <span class="bolded">
-                        ${exp.post_title}
-                      </span>
-                      <span>
-                      ${formatDateRange(exp.start_date, exp.end_date)}
-                      </span>
-                    </div>
-                    <div class="projectName bolded">
-                      <span>
-                        ${exp.specialization}, ${exp.location} | ${exp.company}
-                      </span>
-                    </div>
-                    <div>
-                      <p>
-                        ${exp.description}
-                      </p>
-                    </div>
-                  </li>
-                `).join('')}
-                
-              </ul>
-            </div>
-            
-            <div class="workExperience">
-              <h2>
-                Education
-              </h2>
-              <ul>
-
-                ${user.educations.map((edu) => `
-                    <li>
-                      <div class="jobPosition">
-                        <span class="bolded">
-                          ${edu.degree}
-                        </span>
-                        <span>
-                          ${formatDateRange(edu.start_date, edu.end_date)}
-                        </span>
-                      </div>
-                      <div class="projectName bolded">
-                        <span>
-                        ${edu.specialization} | ${edu.school}
-                        </span>
-                      </div>
-                      <div>
-                        <p>
-                          ${edu.description}
-                        </p>
-                      </div>
-                    </li>
-                `).join('')
-        }
-                
-              </ul>
-            </div>
-
-          </div>
-        </div>
-      </page>
-   </body>
-</html>
-      `;
-
 
       Alert.alert(
         'Choose Resume Model',
         'Please choose a resume model before generating your CV.',
         [
           {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
             text: 'Model 1',
             onPress: async () => {
               await generatePDF(resumeModel1);
-            },
+            }
           },
           {
             text: 'Model 2',
             onPress: async () => {
               await generatePDF(resumeModel2);
-            },
+            }
           },
+          {
+            text: 'Model 3',
+            onPress: async () => {
+              await generatePDF(resumeModel3);
+            }
+          }
         ],
-        { cancelable: false }
+        {
+          cancelable: true,
+        },
       );
+      
     } catch (error) {
       console.error('Error downloading CV:', error);
       Alert.alert('Error', 'An error occurred while downloading the CV.');
