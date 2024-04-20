@@ -7,7 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../config/firebase'; // Import Firebase auth
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite';
 import { db } from '../config/firebase';
+import { LogBox } from 'react-native';
 
+LogBox.ignoreLogs(['Warning: ...']); 
+LogBox.ignoreAllLogs()
 
 export default function Home({ navigation, route }) {
   const skiped = route.params?.skiped;

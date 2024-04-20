@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity , ScrollView} from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity , ScrollView , Alert} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
@@ -54,6 +54,11 @@ export default function AddEducationPage({ route }) {
     };
 
     const handleSubmit = async () => {
+        if (!school || !degree || !specialization || !startDate || !endDate || !description) {
+            Alert.alert('Error', 'Please fill in all fields.');
+            return;
+        }
+
         const newEducation = {
             school,
             degree,

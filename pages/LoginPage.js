@@ -33,6 +33,10 @@ export default function LoginPage({ route }) {
     navigation.navigate('Home', { skiped: true }); // navigate to home page
   }
 
+  const goToForgot = () => {
+    navigation.navigate('Forgot');
+  }
+
   const togglePasswordVisibility = () => {
     setHidePassword(!hidePassword);
   };
@@ -107,7 +111,7 @@ export default function LoginPage({ route }) {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <Text style={styles.forgotPassword}>Forgot Password</Text>
+        <Text style={styles.forgotPassword} onPress={goToForgot}>Forgot Password</Text>
         <Text style={styles.connectWith}>Or Connect With</Text>
         <View style={styles.socialButtonsContainer}>
           <TouchableOpacity style={styles.socialButton}>

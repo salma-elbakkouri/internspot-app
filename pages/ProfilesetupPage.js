@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform , ScrollView} from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform , ScrollView , Alert} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, where, query, getDocs, doc, updateDoc, setDoc } from 'firebase/firestore/lite'; // Import where, query, getDocs, doc, updateDoc, setDoc
@@ -35,6 +35,12 @@ export default function ProfilesetupPage({ route }) {
     const navigation = useNavigation();
 
     const navigateToEducationPage = async () => {
+
+        if (!firstName || !lastName || !phoneNumber || !dateOfBirth || !state) {
+            Alert.alert('Error', 'Please fill in all fields.');
+            return;
+        }
+
         const q = query(collection(db, 'users'), where('email', '==', user.email));
         const querySnapshot = await getDocs(q);
         const userData = [];

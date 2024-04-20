@@ -32,6 +32,7 @@ import EditProfilePage from './pages/EditProfilePage';
 import EditEducationPage from './pages/EditEducationPage';
 import EditExperiencePage from './pages/EditExperiencePage';
 import ApplicationOfferDetail from './pages/ApplicationOfferDetail';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 const Stack = createStackNavigator();
 
@@ -69,6 +70,7 @@ export default function App() {
         <Stack.Screen name="EditEducationPage" component={EditEducationPage} />
         <Stack.Screen name="EditExperiencePage" component={EditExperiencePage} />
         <Stack.Screen name="ApplicationOfferDetail" component={ApplicationOfferDetail} />
+        <Stack.Screen name="Forgot" component={ForgotPasswordPage} />
         
       </Stack.Navigator>
     </NavigationContainer>
