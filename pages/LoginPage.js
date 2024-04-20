@@ -1,12 +1,12 @@
-import React , {useState} from 'react';
-import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity , Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { auth, signInWithEmailAndPassword } from '../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-export default function LoginPage({route}) {
+export default function LoginPage({ route }) {
   const navigation = useNavigation();
   const OfferdetailPageRedirect = route.params?.OfferdetailPageRedirect;
 
@@ -20,17 +20,17 @@ export default function LoginPage({route}) {
         OfferdetailPageRedirect: true,
         offer: route.params.offer,
       }); //navigate to sign-up page 
-    }else {
+    } else {
       navigation.navigate('Signup'); //navigate to sign-up page
     }
   };
 
   const navigateToSkipLoginInterestPage = () => {
-    navigation.navigate('SkipLoginInterestPage', {skiped: true}); // navigate to skip login interest page
+    navigation.navigate('SkipLoginInterestPage', { skiped: true }); // navigate to skip login interest page
   };
 
   const navigateToHomePage = () => {
-    navigation.navigate('Home', {skiped: true}); // navigate to home page
+    navigation.navigate('Home', { skiped: true }); // navigate to home page
   }
 
   const togglePasswordVisibility = () => {
@@ -38,10 +38,10 @@ export default function LoginPage({route}) {
   };
 
   const navigateToOfferPage = () => {
-    navigation.navigate('OfferdetailPage', { 
+    navigation.navigate('OfferdetailPage', {
       offer: route.params.offer,
       comeFromLoginPage: true,
-     });
+    });
   }
 
   const handleLogin = async () => {
@@ -54,29 +54,31 @@ export default function LoginPage({route}) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const userData = userCredential.user;
 
-      // if (!userData.emailVerified) {
-      //   Alert.alert(
-      //     'Email Verification Required',
-      //     'Please verify your email before logging in. Check your inbox for verification instructions.'
-      //   );
-      //   // You may choose to send a verification email again here if needed
-      //   return;
-      // }
-
-
       setEmail('');
-      setPassword('');
-      setHidePassword(true);
-      if (OfferdetailPageRedirect) {
-        navigateToOfferPage();
-        return;
+        setPassword('');
+        setHidePassword(true);
+
+
+        if (!userData.emailVerified) {
+          Alert.alert(
+            'Email Verification Required',
+            'Please verify your email before logging in. Check your inbox for verification instructions.'
+          );
+          return;
+        }
+      
+
+        
+        if (OfferdetailPageRedirect) {
+          navigateToOfferPage();
+          return;
+        }
+        navigation.navigate('Home', { user: userData, skiped: false });
+      } catch (error) {
+        console.error('Error signing in:', error.message);
+        Alert.alert('Error', 'Failed to sign in. Please try again.');
       }
-      navigation.navigate('Home', { user: userData, skiped: false });
-    } catch (error) {
-      console.error('Error signing in:', error.message);
-      Alert.alert('Error', 'Failed to sign in. Please try again.');
-    }
-  };
+    };
 
   return (
     <View style={styles.container}>
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   eyeIcon: {
-    position:'absolute',
+    position: 'absolute',
     right: 15
   },
 });
