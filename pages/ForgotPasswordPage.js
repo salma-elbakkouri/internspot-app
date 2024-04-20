@@ -1,24 +1,46 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../config/firebase';
+import { sendPasswordResetEmail } from 'firebase/auth'; // Import sendPasswordResetEmail from firebase/auth
+
 
 export default function ForgotPasswordPage() {
   const navigation = useNavigation();
 
   const [email, setEmail] = useState('');
 
-  const handleReset = async () => {
-    if (!email) {
-      Alert.alert('Error', 'Please enter your email.');
-      return;
-    }
-  
-    // code to send reset password
-    
+  const validateEmail = (email) => {
+    // Simple email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
-  
+
+  const handleReset = async () => {
+    try {
+      // Check if the email is valid
+      if (!validateEmail(email)) {
+        Alert.alert('Invalid Email', 'Please enter a valid email address');
+        return;
+      }
+
+      // Send password reset email
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert('Password Reset Email Sent', `A password reset email has been sent to ${email}`);
+      handleBack();
+    } catch (error) {
+      // If error is due to user not found, show alert
+      if (error.code === 'auth/user-not-found') {
+        Alert.alert('User Not Found', `There is no user with the email ${email}`);
+      } else {
+        // Otherwise, show generic error
+        console.error('Error resetting password:', error);
+        Alert.alert('Error', 'An error occurred while resetting password. Please try again later.');
+      }
+    }
+  };
+
 
   const handleBack = () => {
     navigation.goBack();
@@ -87,6 +109,6 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
     zIndex: 1,
-    color:'white',
+    color: 'white',
   },
 });
