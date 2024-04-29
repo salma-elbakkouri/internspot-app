@@ -1,16 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icon library
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const { width, height } = Dimensions.get('window');
 
 export default function WelcomePage() {
   const navigation = useNavigation();
 
+  const { width } = Dimensions.get('window');
+  const isWeb = Platform.OS === 'web';  // Check if the platform is web
+
   const handleLoginPress = () => {
     navigation.navigate('Login');
   };
+
+  // Define styles inside the component to use the isWeb flag and responsive layout
+  const styles = getStyles(width, isWeb);
 
   return (
     <View style={styles.container}>
@@ -19,12 +23,11 @@ export default function WelcomePage() {
         <Image
           source={require('../assets/welcomepic.png')}
           style={styles.image}
+          onError={(e) => console.error("Failed to load image:", e.nativeEvent.error)} // Log error
         />
         <View style={styles.textContainer}>
           <Text style={styles.bigText}>
-            <Text style={styles.blackText}>Find Your{"\n"}</Text>
-            <Text style={styles.blueText}>Dream Internship{"\n"}</Text>
-            <Text style={styles.blackText}>Here!</Text>
+            Find Your <Text style={styles.blueText}>Dream Internship</Text> Here!
           </Text>
           <Text style={styles.smallText}>
             Explore all the most exciting internships based on your interest and study major.
@@ -38,62 +41,73 @@ export default function WelcomePage() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 20,
-    position: 'relative', // Added to establish positioning context
-  },
-  title: {
-    position: 'absolute',
-    top: 30,
-    right: 20,
-    color: '#0047D2',
-    fontSize: 21,
-    fontWeight: 'bold',
-    marginTop:30,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: width * 0.8,
-    height: height * 0.4,
-    resizeMode: 'contain',
-    marginBottom: 20,
-  },
-  textContainer: {
-    marginBottom: 20,
-  },
-  bigText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  blackText: {
-    color: 'black',
-  },
-  blueText: {
-    color: '#0047d2',
-    fontWeight: 'bold',
-  },
-  smallText: {
-    color: '#524B6B',
-    fontSize: 12,
-  },
-  button: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#0047d2',
-    borderRadius: 50,
-    padding: 15,
-  },
-});
+// Function to dynamically generate responsive styles
+function getStyles(width, isWeb) {
+  const scale = width < 768 ? (width < 360 ? 1.2 : 1) : 0.8; // Adjust scale based on width thresholds
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: '5%',
+      paddingTop: '5%',
+      paddingBottom: '5%',
+      position: 'relative',
+    },
+    title: {
+      position: 'absolute',
+      top: isWeb ? '2%' : '10%',
+      right: '5%',
+      color: '#0047D2',
+      fontSize: 25 * scale,
+      fontWeight: 'bold',
+    },
+    content: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    image: {
+      width: isWeb ? '80%' : 300,  // Use a fixed width for mobile
+      height: isWeb ? '50%' : 200,  // Use a fixed height for mobile
+      resizeMode: 'contain',
+      marginBottom: '5%',
+    },
+    
+    textContainer: {
+      marginBottom: '5%',
+      width: '90%', // Responsive width for text container
+      textAlign: 'center', // Center the text within the container
+    },
+    bigText: {
+      fontSize: 30 * scale,
+      fontWeight: 'bold',
+      marginBottom: '2%',
+    },
+    blackText: {
+      color: 'black',
+    },
+    blueText: {
+      color: '#0047d2',
+      fontWeight: 'bold',
+    },
+    smallText: {
+      color: '#524B6B',
+      fontSize: 19 * scale,
+    },
+    button: {
+      position: 'absolute',
+      bottom: '5%',
+      right: '5%',
+      backgroundColor: '#0047d2',
+      borderRadius: 50,
+      padding: '1%',
+      justifyContent: 'center', // Center content vertically
+      alignItems: 'center', // Center content horizontally
+      width: 50,  // Define a specific size for the button
+      height: 50,  // Define a specific size for the button
+    },
+
+  });
+}

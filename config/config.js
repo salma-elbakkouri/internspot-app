@@ -1,6 +1,8 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import { Platform } from 'react-native';
+
 
 // const firebaseConfig = {
 //   apiKey: "AIzaSyBSLvtOwLYJ45f4-AwacbZp9PfHoYpfYcU",
@@ -28,4 +30,11 @@ if (!firebase.apps.length)
     firebase.initializeApp(firebaseConfig)
 }
 
+// added code for web
+auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  .catch(function(error) {
+    console.error('Error setting Firebase auth persistence:', error);
+  });
+
 export { firebase };
+
