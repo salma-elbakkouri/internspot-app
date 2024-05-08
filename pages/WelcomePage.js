@@ -60,28 +60,28 @@ function getStyles(width, isWeb) {
       top: isWeb ? '2%' : '10%',
       right: '5%',
       color: '#0047D2',
-      fontSize: 25 * scale,
+      fontSize: 55 * scale,
       fontWeight: 'bold',
     },
     content: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection:'row',
+      left: '5%'
     },
     image: {
-      width: isWeb ? '80%' : 300,  // Use a fixed width for mobile
-      height: isWeb ? '50%' : 200,  // Use a fixed height for mobile
+      width: isWeb ? '400px' : 300,  // Use a fixed width for mobile
+      height: isWeb ? '370' : 200,  // Use a fixed height for mobile
       resizeMode: 'contain',
-      marginBottom: '5%',
+      marginBottom: '20%',
     },
     
     textContainer: {
       marginBottom: '5%',
-      width: '90%', // Responsive width for text container
+      marginTop: '10%',
+      width: '100%', // Responsive width for text container
       textAlign: 'center', // Center the text within the container
     },
     bigText: {
-      fontSize: 30 * scale,
+      fontSize: 40 * scale,
       fontWeight: 'bold',
       marginBottom: '2%',
     },
@@ -94,7 +94,7 @@ function getStyles(width, isWeb) {
     },
     smallText: {
       color: '#524B6B',
-      fontSize: 19 * scale,
+      fontSize: 25* scale,
     },
     button: {
       position: 'absolute',
