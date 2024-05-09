@@ -30,11 +30,12 @@ export default function WelcomePage() {
             Find Your <Text style={styles.blueText}>Dream Internship</Text> Here!
           </Text>
           <Text style={styles.smallText}>
-            Explore all the most exciting internships based on your interest and study major.
+          Discover tailored internships matched to your interests and major. Explore diverse opportunities spanning various fields. Start your journey to a rewarding internship experience today!
           </Text>
         </View>
       </View>
       <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+       <Text>Next</Text>
         <AntDesign name="arrowright" size={24} color="white" />
       </TouchableOpacity>
     </View>
@@ -60,30 +61,43 @@ function getStyles(width, isWeb) {
       top: isWeb ? '2%' : '10%',
       right: '5%',
       color: '#0047D2',
-      fontSize: 25 * scale,
+      fontSize: 55 * scale,
       fontWeight: 'bold',
     },
     content: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection:'row',
+      right: '15%',
+      justifyContent: 'flex-end',
     },
     image: {
-      width: isWeb ? '80%' : 300,  // Use a fixed width for mobile
-      height: isWeb ? '50%' : 200,  // Use a fixed height for mobile
-      resizeMode: 'contain',
-      marginBottom: '5%',
+      width: isWeb ? '300px' : 300,  // Use a fixed width for mobile
+      height: isWeb ? '300px' : 200,  // Use a fixed height for mobile
+      // resizeMode: 'contain',
+      // marginBottom: '20%',
     },
     
     textContainer: {
-      marginBottom: '5%',
-      width: '90%', // Responsive width for text container
+      marginBottom: '10%',
+      marginTop: '9%',
+      width: '60%', // Responsive width for text container
       textAlign: 'center', // Center the text within the container
+      paddingLeft: '3%',
     },
+    // image: {
+    //   width: isWeb ? '100%' : width * 0.8, // Adjust width based on the platform
+    //   height: isWeb ? '70%' : width * 0.6, // Adjust height based on the platform
+    //   resizeMode: 'contain',
+    //   marginBottom: isWeb ? '5%' : '2%', // Adjust marginBottom as needed
+    // },
+    
+    // textContainer: {
+    //   width: '100%', // Responsive width for text container
+    //   textAlign: 'center', // Center the text within the container
+    // },
     bigText: {
-      fontSize: 30 * scale,
+      fontSize: 35 * scale,
       fontWeight: 'bold',
-      marginBottom: '2%',
+      marginBottom: '1%',
     },
     blackText: {
       color: 'black',
@@ -94,7 +108,7 @@ function getStyles(width, isWeb) {
     },
     smallText: {
       color: '#524B6B',
-      fontSize: 19 * scale,
+      fontSize: 20* scale,
     },
     button: {
       position: 'absolute',
@@ -105,8 +119,11 @@ function getStyles(width, isWeb) {
       padding: '1%',
       justifyContent: 'center', // Center content vertically
       alignItems: 'center', // Center content horizontally
-      width: 50,  // Define a specific size for the button
+      width: 150,  // Define a specific size for the button
       height: 50,  // Define a specific size for the button
+      color:'white',
+      display: 'flex',  
+      flexDirection: 'row',
     },
 
   });
