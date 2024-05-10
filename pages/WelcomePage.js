@@ -20,23 +20,23 @@ export default function WelcomePage() {
     <View style={styles.container}>
       <Text style={styles.title}>Internspot</Text>
       <View style={styles.content}>
-        <Image
-          source={require('../assets/welcomepic.png')}
-          style={styles.image}
-          onError={(e) => console.error("Failed to load image:", e.nativeEvent.error)} // Log error
-        />
         <View style={styles.textContainer}>
           <Text style={styles.bigText}>
             Find Your <Text style={styles.blueText}>Dream Internship</Text> Here!
           </Text>
           <Text style={styles.smallText}>
-          Discover tailored internships matched to your interests and major. Explore diverse opportunities spanning various fields. Start your journey to a rewarding internship experience today!
+          Discover an array of thrilling internship opportunities tailored to your passions and academic focus. Whether you're intrigued by technology, fascinated by finance, or passionate about public service, our platform offers a diverse selection of internships aligned with your interests and study major.
           </Text>
         </View>
+        <Image
+          source={require('../assets/welcomepic.png')}
+          style={styles.image}
+          onError={(e) => console.error("Failed to load image:", e.nativeEvent.error)} // Log error
+        />
       </View>
       <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-       <Text>Next</Text>
-        <AntDesign name="arrowright" size={24} color="white" />
+        <Text style={styles.button_text}>Next</Text>
+        <AntDesign name="arrowright" size={15} color="white" />
       </TouchableOpacity>
     </View>
   );
@@ -59,48 +59,30 @@ function getStyles(width, isWeb) {
     title: {
       position: 'absolute',
       top: isWeb ? '2%' : '10%',
-      right: '5%',
+      left: '5%',
       color: '#0047D2',
       fontSize: 55 * scale,
       fontWeight: 'bold',
     },
     content: {
       flexDirection:'row',
-      right: '15%',
-      justifyContent: 'flex-end',
+      justifyContent: 'space-between', // Adjust alignment based on platform
     },
     image: {
-      width: isWeb ? '300px' : 300,  // Use a fixed width for mobile
-      height: isWeb ? '300px' : 200,  // Use a fixed height for mobile
-      // resizeMode: 'contain',
-      // marginBottom: '20%',
+      width: isWeb ? '360px' : 300,  // Use a fixed width for mobile
+      height: isWeb ? '360px' : 200,  // Use a fixed height for mobile
     },
-    
     textContainer: {
-      marginBottom: '10%',
-      marginTop: '9%',
-      width: '60%', // Responsive width for text container
+      width: isWeb ? '60%' : 'auto', // Responsive width for text container
       textAlign: 'center', // Center the text within the container
-      paddingLeft: '3%',
+      paddingLeft: isWeb ? '0%' : 0, // Add padding for web
+      paddingTop:'9%',
+      paddingBottom: '10%',
     },
-    // image: {
-    //   width: isWeb ? '100%' : width * 0.8, // Adjust width based on the platform
-    //   height: isWeb ? '70%' : width * 0.6, // Adjust height based on the platform
-    //   resizeMode: 'contain',
-    //   marginBottom: isWeb ? '5%' : '2%', // Adjust marginBottom as needed
-    // },
-    
-    // textContainer: {
-    //   width: '100%', // Responsive width for text container
-    //   textAlign: 'center', // Center the text within the container
-    // },
     bigText: {
-      fontSize: 35 * scale,
+      fontSize: 40 * scale,
       fontWeight: 'bold',
-      marginBottom: '1%',
-    },
-    blackText: {
-      color: 'black',
+      marginBottom: '2%',
     },
     blueText: {
       color: '#0047d2',
@@ -108,23 +90,27 @@ function getStyles(width, isWeb) {
     },
     smallText: {
       color: '#524B6B',
-      fontSize: 20* scale,
+      fontSize: 28 * scale,
     },
     button: {
       position: 'absolute',
-      bottom: '5%',
-      right: '5%',
+      bottom: '20%',
+      left: '70px',
       backgroundColor: '#0047d2',
-      borderRadius: 50,
+      borderRadius: 10,
       padding: '1%',
-      justifyContent: 'center', // Center content vertically
-      alignItems: 'center', // Center content horizontally
-      width: 150,  // Define a specific size for the button
-      height: 50,  // Define a specific size for the button
-      color:'white',
-      display: 'flex',  
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 145,
+      // width: isWeb ? 'auto' : 145,
+      height: 45,
+      display: 'flex',
       flexDirection: 'row',
+      gap: 17,
     },
-
+    button_text: {
+      color:'white',
+      fontSize: 27 * scale,
+    },
   });
 }
